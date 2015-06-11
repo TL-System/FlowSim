@@ -1,0 +1,27 @@
+
+=== HDFS allocation ===
+HDFS.py
+Allocate chunks at HDFS. The rule is each two replicas are allocated in the same rack.
+As in Fat-Tree, there are pods. So what about the third replica? In the same pod or other pods?
+We choose to store the third replica in the same pod.
+
+The processing process is:
+1. Shuffle M items.
+2. Compute slots number in each holder: ceil(M*d/n).
+3. For holder n[i] (i starts from 1) and item M[j] (jo starts from 1), first M[j] puts in n[i], second M[j]
+  puts in n[i'] where i' is another holder in the same rack by topo.GetSameRack(i), third M[j] puts in n[i'']
+  where i'' is another holder in other racks by topo.OtherRack(i). n[i]--, n[i']--, n[i'']--.
+4. Iteratively executes step 3 until all the items are allocated.
+
+=== Access Pattern ===
+There can be any type of allocation on HDFS or other file system.
+PowerLawOnHDFS.py
+This file allocates flows according to power-law distribution on HDFS.
+
+=== Flow Allocation Results ===
+These results can be found in corresponding Flows/
+For example, power-law distribution is printed in PowerlawFlows/
+
+
+
+

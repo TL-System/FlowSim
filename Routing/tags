@@ -1,0 +1,15 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BuildPath	ECMP_FatTree.py	/^    def BuildPath(self, topo):$/;"	m	class:ECMP
+CalculatePath	ECMP_FatTree.py	/^    def CalculatePath(self):$/;"	m	class:ECMP
+ECMP	ECMP_FatTree.py	/^class ECMP(Routing):$/;"	c
+GetAggr	ECMP_FatTree.py	/^    def GetAggr(self, serverId, torId):$/;"	m	class:ECMP
+GetToR	ECMP_FatTree.py	/^    def GetToR(self, serverId):$/;"	m	class:ECMP
+IsSamePod	ECMP_FatTree.py	/^    def IsSamePod(self, srcId, dstId):$/;"	m	class:ECMP
+__author__	ECMP_FatTree.py	/^__author__ = 'lich'$/;"	v
+__del__	ECMP_FatTree.py	/^    def __del__(self):$/;"	m	class:ECMP	file:
+a	ECMP_FatTree.py	/^a = 0$/;"	v

@@ -1,0 +1,10 @@
+=== Parameter List ===
+N: total access times. e.g., 10000
+M: rank range, e.g., rank first 100. This number is equal to the number of distinct chunks
+d: the number of replicas, e.g., 3
+n: the number of holdes, e.g., 1024. Therefore, each holder will store M*d/n chunks.
+a: alpha, the sckewness of the power-law distribution.
+
+
+
+
