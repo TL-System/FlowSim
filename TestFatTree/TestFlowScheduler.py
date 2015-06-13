@@ -18,9 +18,9 @@ class TestFlowScheduler(FlowScheduler):
         self.mean = int(args[2])
         self.avgFlowNums = int(args[3])
         self.alpha = float(args[4])
-        #f_name = inDir + "K%d_S%0.0f_L%d_a%d_flows.txt" \
-        #         % (self.K, self.flowSize, self.mean, self.avgFlowNums)
-        f_name = "K24_input_%0.1f.txt" % self.alpha
+        f_name = inDir + "K%d_S%0.0f_L%d_a%d_flows.txt" \
+                 % (self.K, self.flowSize, self.mean, self.avgFlowNums)
+        #f_name = "K24_input_%0.1f.txt" % self.alpha
         f = open(f_name, "r")
         for line in f.readlines():
             l = line.split()
