@@ -34,7 +34,7 @@ def SpineLeafFlowInput():
     f_name = inDir + "S%0.0f_L%d_a%d_flows.txt" % (flowSize / MB, mean, avgFlowNum)
     f = open(f_name, "w")
     #
-    flowNums = 16
+    flowNums = 16  # SpineLeaf.numberOfServers
     startTime = 0.0
     randPoisson = PoissonRand(mean=mean, bound=1.0 / mean * 10.0)
     for j in range(avgFlowNum):

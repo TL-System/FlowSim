@@ -13,13 +13,12 @@ class TestFlowScheduler(FlowScheduler):
         """
         The args is a tuple containing: K, S, L, a, which are following the parameters in GenFlowInput.py
         """
-        self.K = int(args[0])
-        self.flowSize = float(args[1])
-        self.mean = int(args[2])
-        self.avgFlowNums = int(args[3])
-        self.alpha = float(args[4])
-        f_name = inDir + "K%d_S%0.0f_L%d_a%d_flows.txt" \
-                 % (self.K, self.flowSize, self.mean, self.avgFlowNums)
+        self.flowSize = float(args[0])
+        self.mean = int(args[1])
+        self.avgFlowNums = int(args[2])
+        self.alpha = float(args[3])
+        f_name = inDir + "S%0.0f_L%d_a%d_flows.txt" \
+                 % (self.flowSize, self.mean, self.avgFlowNums)
         f = open(f_name, "r")
         for line in f.readlines():
             l = line.split()
@@ -34,11 +33,11 @@ class TestFlowScheduler(FlowScheduler):
         f.close()
 
     def PrintFlows(self):
-        f_name = outDir + "K%d_S%0.0f_L%d_a%0.1f_out.txt" \
-                 % (self.K, self.flowSize, self.mean, self.alpha)
+        f_name = outDir + "S%0.0f_L%d_a%0.1f_out.txt" \
+                 % (self.flowSize, self.mean, self.alpha)
         f = open(f_name, "w")
-        f_name = outDir + "K%d_S%0.0f_L%d_a%0.1f_plot.dat" \
-                 % (self.K, self.flowSize, self.mean, self.alpha)
+        f_name = outDir + "S%0.0f_L%d_a%0.1f_plot.dat" \
+                 % (self.flowSize, self.mean, self.alpha)
         f_plot = open(f_name, "w")
         for flow in self.finishedFlows:
             flowTransTime = flow.finishTime - flow.startTime
