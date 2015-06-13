@@ -1,10 +1,6 @@
 Flow-level-Network-Simulator
 ============================
 
-This is an event based flow-level network simulator. It is written in Python for fast prototype implementation.
-It is memory consumed since data structure in python is always crazy...
-OK, it is because python is an intepretation language, the translation from virtual machine to machine code is without controlling.
+An generic event-driven flow-level network simulator for fast prototype implementation.
+The goal is to evaluate rate control transport schemes for data center networks
 
-Overall, this is a prototype just for fast implementation to correct all the fuctions we need. 
-
-I will later rewrite the simulator by C++ to improve the performance.
