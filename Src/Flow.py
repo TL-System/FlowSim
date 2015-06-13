@@ -49,9 +49,16 @@ class Flow:
         # Priority / Service
         self.priority = -1
 
+        self.deadline = -1
+        self.remainTime = -1
+
     def SetFlowSize(self, size):
         self.flowSize = size
         self.remainSize = size
+
+    def SetFlowDeadline(self,ddl):
+        self.deadline = ddl
+        self.remainSize = ddl
 
     # Routing with give a list of nodes that this flow traverses
     # BuildPath() builds a path with pathNodeIds[:]

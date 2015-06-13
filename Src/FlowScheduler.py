@@ -4,6 +4,7 @@ from Unit import *
 # This file describes the class FlowScheduler
 import sys
 
+
 class FlowScheduler:
     def __init__(self):
         # Flow list in initial time
@@ -23,7 +24,7 @@ class FlowScheduler:
 
     def AssignLinks(self, links):
         """
-        We need links information because we need to update flow info
+        Need links to update flow info
         """
         self.Links = links
 
@@ -34,6 +35,7 @@ class FlowScheduler:
         Return the flow list.
         """
         self.toStartFlows = self.flows[:]
+        # Sort the flows in place
         self.toStartFlows.sort(key=lambda x: x.startTime)
 
     def GetFlow(self, flowId):
@@ -50,16 +52,38 @@ class FlowScheduler:
         # Update remain size
         flow.remainSize -= flow.bw * (curTime - flow.updateTime)
         flow.updateTime = curTime
-        
+
         pathInLink = flow.pathLinkIds
         bw = 1.0 * Gb
         for linkId in pathInLink:
             link = self.Links[linkId]
-            curBw = link.linkCap / len(link.flowIds)
+            if link.scheduling == 'maxmin':
+                curBw = link.linkCap / len(link.flowIds)
+            elif link.scheduling == 'wfq':
+                # Active queues
+                # Shares of this flow's queue
+                # share = bw * weightOwnQ / sumActiveWeights
+                # Share of this flow in its queue
+                #curBw = share / len(flowsInSameQueue)
+                pass
+            elif link.scheduling == 'sp':
+                highest = max(link.flowIds, key=lambda x: x.priority)
+                if flow.priority == highest.priority:
+                    all_highest = [f for f in link.flowIds if f.priority == highest.priority]
+                    curBw = link.linkCap / len(all_highest)
+                else:
+                    curBw = 0.0001 # to avoid division by zero errors
+
             if bw > curBw:
                 bw = curBw
-        flow.bw = bw
+        #TODO: Need to do work conserving
+        #wastingFlows = self.runningFlows
+        #while len(wastingFlows) > 0:
+        #    for wf in wastingFlows:
+        #        wfbw = wf.bw
+        #        wfbw
 
+        flow.bw = bw
         flow.finishTime = curTime + flow.remainSize / bw
 
     def UpdateFlow(self, curFlow, flag):
@@ -86,3 +110,5 @@ class FlowScheduler:
         """
         print finishedFlows
         """
+        for f in self.finishedFlows:
+            print(f.flowId)

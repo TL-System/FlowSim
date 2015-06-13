@@ -18,7 +18,7 @@ class Link:
         self.flowIds = []
 
         # Scheduling strtegy of this link
-        # Weight fair queueing, strict priority queueing, Maxmin Fair (Default)
+        # Weight fair queueing, strict priority queueing, Max-min Fair (Default)
         self.scheduling = 'maxmin'
 
     def SetCap(self, cap):
@@ -27,6 +27,8 @@ class Link:
     def SetScheduling(self, sched):
         if sched == 'maxmin' or sched == 'wfq' or sched == 'sp':
             self.scheduling = sched
+        else:
+            print("Error: " + sched + ' is unavailable. Try \'maxmin\', \'wfq\', or \'sp\'')
 
     def __del__(self):
         pass

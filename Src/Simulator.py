@@ -23,6 +23,7 @@ class Simulator:
     def AssignRoutingEngine(self, Routing):
         """
         Assign the routing method in a centralized way.
+        Routing is a function that takes topo as input
         """
         self.routing = Routing(self.topo)
         # We can get path by
