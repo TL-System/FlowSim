@@ -18,8 +18,8 @@ def main():
     topoMatrix = BuildMatrix()
     topo = Topology()
     topo.GenTopoFromMatrix(topoMatrix, 6, Node, Link)
-    routing = Routing()
-    routing.BFS(topo)
+    routing = Routing(topo)
+    routing.BFS()
     for path in routing.pathList:
         print path, "\t", routing.pathList[path]
 
