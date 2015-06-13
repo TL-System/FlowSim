@@ -6,24 +6,20 @@ sys.path.append("..")
 from Src.Topology import *
 from Src.Node import *
 from Src.Link import *
-from math import ceil,floor
+from math import ceil, floor
 
 SERVER = 2
-TOR = 8
+TOR = 2
 CORE = 2
 
-class FatTree(Topology):
-    def __init__(self, K=4):
+class SpineLeaf(Topology):
+    def __init__(self, s=SERVER, t=TOR, c=CORE):
         # initialize nodes and links
         Topology.__init__(self)
-        # default topology size is K=4
-        self.K = K
-        # calculate servers number
-        self.CalServerNums()
-        # calculate tor switch number
-        self.CalToRNums()
-        # calculate core switch number
-        self.CalCoreNums()
+        self.serverPerRack = s
+        self.numOfServers = s * t
+        self.numOfToRs = t
+        self.numOfCores = c
 
     def CreateTopology(self):
         # create nodes
@@ -36,51 +32,40 @@ class FatTree(Topology):
         We build this topology as a directed graph.
         It indicates n1 --- n2 will translate into to edges: (1, 2) and (2, 1)
         """
-        for serverId in range(1, self.numOfServers + 1):
-            s2torId = (serverId - 1) / (self.K / 2) + 1
-            torNodeId = self.ConvertToNodeId(s2torId, TOR)
-            self.links[serverId, torNodeId] = Link((serverId, torNodeId))
-            self.links[torNodeId, serverId] = Link((torNodeId, serverId))
-        for torId in range(1, self.numOfToRs + 1):
-            podId = (torId - 1) / (self.K / 2) + 1
-            torNodeId = self.ConvertToNodeId(torId, TOR)
-            for i in range(0, self.K / 2):
-                t2aggrId = (podId - 1) * (self.K / 2) + 1 + i
-                aggrNodeId = self.ConvertToNodeId(t2aggrId, AGGR)
-                self.links[torNodeId, aggrNodeId] = Link((torNodeId, aggrNodeId))
-                self.links[aggrNodeId, torNodeId] = Link((aggrNodeId, torNodeId))
-        for aggrId in range(1, self.numOfAggrs + 1):
-            aggrNodeId = self.ConvertToNodeId(aggrId, AGGR)
-            for j in range(0, self.K / 2):
-                a2coreId = ((aggrId - 1) % (self.K / 2)) * (self.K / 2) + 1 + j
-                coreNodeId = self.ConvertToNodeId(a2coreId, CORE)
-                self.links[aggrNodeId, coreNodeId] = Link((aggrNodeId, coreNodeId))
-                self.links[coreNodeId, aggrNodeId] = Link((coreNodeId, aggrNodeId))
+        # add links between servers and tors
+        for s in range(1, self.numOfServers+1):
+            # Get the tor that server s is connected to
+            # 1 to SERVER is connected to (self.numberOfServers + 1)
+            t = self.numOfServers + int(ceil(float(s) / self.serverPerRack))
+            print s, self.serverPerRack, ceil(s / self.serverPerRack), floor(s/self.serverPerRack), int(ceil(float(s) / self.serverPerRack))
+            self.links[s, t] = Link((s, t))
+            self.links[t, s] = Link((t, s))
+
+        # add links between tors and cores
+        for t in range(self.numOfServers+1, self.numOfServers+self.numOfToRs+1):
+            for c in range(self.numOfServers+self.numOfToRs+1, self.numOfServers + self.numOfToRs + self.numOfCores + 1):
+                self.links[t, c] = Link((t, c))
+                self.links[c, t] = Link((c, t))
 
     def CreateNodes(self):
-         # node id is start from 1
+         # node id start from 1
         self.nodes.append(None)
         # append server node
+        # [1, SERVER * TOR] are servers
         self.AddNodes(self.numOfServers)
+
         # append tor switch node
+        # [SERVER * TOR + 1, SERVER * TOR + TOR] are leaves
         self.AddNodes(self.numOfToRs)
+
         # append core switch nodes
+        # [SERVER * TOR * CORE + TOR + 1, SERVER * TOR * CORE + TOR + CORE] are spines
         self.AddNodes(self.numOfCores)
-
-    # calculate related metircs
-    def CalServerNums(self):
-        self.numOfServers = SERVER * TOR * CORE
-
-    def CalToRNums(self):
-        self.numOfToRs = TOR
-
-    def CalCoreNums(self):
-        self.numOfCores = CORE
 
     # Given id of server, return id of rack
     # server and rack are numbered starting from 0
     def GetRackId(self, serverId):
-        return floor(serverId/SERVER)
+        return int(ceil(serverId/SERVER))
 
     def GetSameRack(self, serverId):
         # return the list of servers in the same rack with serverId
@@ -101,7 +86,7 @@ class FatTree(Topology):
     def ConvertToNodeId(self, id, role):
         """
         Convert regular device id into node id.
-        Four roles are defined: 0:server, 1:tor switch, 2:aggregate switch, 3:core switch
+        Four roles are defined: 0:server, 1:tor switch, 2:core switch
         """
         if role == 0:
             return id
@@ -109,10 +94,9 @@ class FatTree(Topology):
             return id + self.numOfServers
         elif role == 2:
             return id + self.numOfServers + self.numOfToRs
-        elif role == 3:
-            return id + self.numOfServers + self.numOfToRs + self.numOfAggrs
         else:
             return 0
+
     # add n nodes to topology instance
     def AddNodes(self, n):
         for id in range(1, n + 1):
@@ -124,12 +108,11 @@ class FatTree(Topology):
     def GetServerNode(self, serverId):
         nodeId = self.ConvertToNodeId(serverId, SERVER)
         return self.nodes[nodeId]
+
     def GetToRNode(self, torId):
         nodeId = self.ConvertToNodeId(torId, TOR)
         return self.nodes[nodeId]
-    def GetAggrNode(self, aggrId):
-        nodeId = self.ConvertToNodeId(aggrId, AGGR)
-        return self.nodes[nodeId]
+
     def GetCoreNode(self, coreId):
         nodeId = self.ConvertToNodeId(coreId, CORE)
         return self.nodes[nodeId]
