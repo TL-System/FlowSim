@@ -7,8 +7,6 @@ import random, getopt
 from RandomGenerator.Poisson import *
 from Src.Unit import *
 
-# The port number of each switch in fat-tree topology
-K = 4
 # Flow size is in MB
 flowSize = 100.0 * MB
 # The mean of poisson arrival rate
@@ -16,11 +14,9 @@ mean = 10
 # The average number of flows generated of each server node
 avgFlowNum = 1
 
-opts, args = getopt.getopt(sys.argv[1:], "K:S:L:a:", ["K=", "S=", "L=", "a="])
+opts, args = getopt.getopt(sys.argv[1:], "S:L:a:", ["S=", "L=", "a="])
 for o, a in opts:
-    if o in ("-K", "--K"):
-        K = int(a)
-    elif o in ("-S", "--S"):
+    if o in ("-S", "--S"):
         flowSize = float(a) * MB
     elif o in ("-L", "--L"):
         mean = int(a)
@@ -29,15 +25,16 @@ for o, a in opts:
 
 inDir = "Input/"
 
-def FatTreeFlowInput():
+def SpineLeafFlowInput():
     """
-    This is function is used to generate flows launched in a fat-tree topology.
-    Each server node in fat-tree starts a flow. The flow arrival rate follows a poisson arrival.
+    This is function is used to generate flows launched in a Spine-Leaf topology.
+    Each server node starts a flow. The flow arrival rate follows a poisson arrival.
     As default, there are 10 flows starts in every second.
     """
-    f_name = inDir + "K%d_S%0.0f_L%d_a%d_flows.txt" % (K, flowSize / MB, mean, avgFlowNum)
+    f_name = inDir + "S%0.0f_L%d_a%d_flows.txt" % (flowSize / MB, mean, avgFlowNum)
     f = open(f_name, "w")
-    flowNums = K ** 3 / 4
+    #
+    flowNums = 16
     startTime = 0.0
     randPoisson = PoissonRand(mean=mean, bound=1.0 / mean * 10.0)
     for j in range(avgFlowNum):
@@ -52,4 +49,4 @@ def FatTreeFlowInput():
     f.close()
 
 if __name__ == "__main__":
-    FatTreeFlowInput()
+    SpineLeafFlowInput()

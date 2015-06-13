@@ -8,8 +8,8 @@ from Src.Node import *
 from Src.Link import *
 from math import ceil, floor
 
-SERVER = 2
-TOR = 2
+SERVER = 6
+TOR = 8
 CORE = 2
 
 class SpineLeaf(Topology):
