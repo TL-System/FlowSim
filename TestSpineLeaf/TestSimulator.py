@@ -1,6 +1,7 @@
 __author__ = 'lich'
 
 import sys
+
 sys.path.append("..")
 
 import getopt
@@ -10,6 +11,7 @@ from TestFlowScheduler import *
 # from Topology.SpineLeaf import *
 from Routing.ECMP_SpineLeaf import *
 
+# TODO: add in topology description for spine leaf
 # Flow size is in MB
 flowSize = 100.0
 # The mean of poisson arrival rate
@@ -29,6 +31,8 @@ for o, a in opts:
         avgFlowNum = int(a)
     elif o in ("-f", "--f"):
         alpha = float(a)
+
+
 def main():
     sim = Simulator()
     testTopo = SpineLeaf()
@@ -37,6 +41,7 @@ def main():
     sim.AssignRoutingEngine(Routing=ECMP)
     sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args=(flowSize, mean, avgFlowNum, alpha))
     sim.Run()
+
 
 if __name__ == "__main__":
     main()

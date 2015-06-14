@@ -46,8 +46,9 @@ class Simulator:
         """
         Fire up the simulator. The function calculates the transferring time for each flow.
         """
-        # start all the flows along with updating related flow's transfer time
+        # start all the flows along with updating related flow transfer time
         while self.sched.toStartFlows:
+            # TODO: Do load balancing here
             # the first flow is with earliest startTime
             curStartFlow = self.sched.toStartFlows[0]
             # update flows if there are flows has already finished
@@ -80,7 +81,6 @@ class Simulator:
         while self.sched.runningFlows:
             # the first flow is always with earliest finish Time
             curFinishFlow = self.sched.runningFlows[0]
-
             # remove it from running list
             self.sched.runningFlows.remove(curFinishFlow)
             # insert it to finished flows
