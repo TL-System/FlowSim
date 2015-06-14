@@ -37,7 +37,7 @@ class SpineLeaf(Topology):
             # Get the tor that server s is connected to
             # 1 to SERVER is connected to (self.numberOfServers + 1)
             t = self.numOfServers + int(ceil(float(s) / self.serverPerRack))
-            print s, self.serverPerRack, ceil(s / self.serverPerRack), floor(s/self.serverPerRack), int(ceil(float(s) / self.serverPerRack))
+            # print s, self.serverPerRack, ceil(s / self.serverPerRack), floor(s/self.serverPerRack), int(ceil(float(s) / self.serverPerRack))
             self.links[s, t] = Link((s, t))
             self.links[t, s] = Link((t, s))
 

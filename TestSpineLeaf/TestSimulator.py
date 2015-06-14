@@ -7,8 +7,8 @@ import getopt
 
 from Src.Simulator import *
 from TestFlowScheduler import *
-from Topology.SpineLeaf import *
-from Routing.ECMP_FatTree import *
+# from Topology.SpineLeaf import *
+from Routing.ECMP_SpineLeaf import *
 
 # Flow size is in MB
 flowSize = 100.0
