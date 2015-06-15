@@ -48,7 +48,6 @@ class Simulator:
         """
         # start all the flows along with updating related flow transfer time
         while self.sched.toStartFlows:
-            # TODO: Do load balancing here
             # the first flow is with earliest startTime
             curStartFlow = self.sched.toStartFlows[0]
             # update flows if there are flows has already finished
@@ -70,6 +69,10 @@ class Simulator:
             # insert current start flow to running list
             self.sched.runningFlows.append(curStartFlow)
             # Update related flow's transfer time in removing a flow
+            # TODO: before inserting, do load banlance
+            # Step 1 find out which spine is less loaded
+            # Less loaded in terms of more flows
+            # Step 2 set the flow's spine to the less loaded spine
             self.sched.UpdateFlow(curStartFlow, "insert")
             # Resort runningFlows by endTime
             self.sched.runningFlows.sort(key=lambda x: x.finishTime)

@@ -42,6 +42,5 @@ def main():
     sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args=(flowSize, mean, avgFlowNum, alpha))
     sim.Run()
 
-
 if __name__ == "__main__":
     main()

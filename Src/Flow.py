@@ -49,8 +49,12 @@ class Flow:
         # Priority / Service
         self.priority = -1
 
+        # Deadline
         self.deadline = -1
         self.remainTime = -1
+
+        # Constant bit rate flows
+        self.cbr = False
 
     def SetFlowSize(self, size):
         self.flowSize = size
@@ -60,6 +64,9 @@ class Flow:
         self.deadline = ddl
         self.remainSize = ddl
 
+    def SerCBR(self, cbr):
+        self.bw = cbr
+        self.cbr = True
     # Routing with give a list of nodes that this flow traverses
     # BuildPath() builds a path with pathNodeIds[:]
     def BuildPath(self, pathNodeIds):
