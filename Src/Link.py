@@ -33,7 +33,7 @@ class Link:
             print("Error: " + sched + ' is unavailable. Try \'maxmin\', \'wfq\', or \'sp\'')
 
     def UpdateRates(self, flow):
-        #TODO: assign rates to all flows, and return the rate of input
+        #TODO: assign rates to all flows, and return the rate of input flow
         return self.flowRates[flow]
 
     def __del__(self):
