@@ -56,6 +56,8 @@ class Flow:
         # Constant bit rate flows
         self.cbr = False
 
+        self.transport
+
     def SetFlowSize(self, size):
         self.flowSize = size
         self.remainSize = size
@@ -67,6 +69,7 @@ class Flow:
     def SerCBR(self, cbr):
         self.bw = cbr
         self.cbr = True
+
     # Routing with give a list of nodes that this flow traverses
     # BuildPath() builds a path with pathNodeIds[:]
     def BuildPath(self, pathNodeIds):

@@ -76,7 +76,7 @@ class FlowScheduler:
 
             if bw > curBw:
                 bw = curBw
-        #TODO: Need to do work conserving
+        #TODO: work conserving
         #wastingFlows = self.runningFlows
         #while len(wastingFlows) > 0:
         #    for wf in wastingFlows:

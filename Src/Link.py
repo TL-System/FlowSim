@@ -17,6 +17,8 @@ class Link:
         # Current Flow ids on this link
         self.flowIds = []
 
+        self.flowRates = dict()
+
         # Scheduling strtegy of this link
         # Weight fair queueing, strict priority queueing, Max-min Fair (Default)
         self.scheduling = 'maxmin'
@@ -29,6 +31,10 @@ class Link:
             self.scheduling = sched
         else:
             print("Error: " + sched + ' is unavailable. Try \'maxmin\', \'wfq\', or \'sp\'')
+
+    def UpdateRates(self, flow):
+        #TODO: assign rates to all flows, and return the rate of input
+        return self.flowRates[flow]
 
     def __del__(self):
         pass
