@@ -41,7 +41,7 @@ class TestFlowScheduler(FlowScheduler):
         f_plot = open(f_name, "w")
         for flow in self.finishedFlows:
             flowTransTime = flow.finishTime - flow.startTime
-            print >> f, "flow %d used %f\t%f\t%f" % (flow.flowId, flowTransTime, flow.startTime, flow.finishTime)
+            print >> f, "%d\t%f\t%f\t%f" % (flow.flowId, flowTransTime, flow.startTime, flow.finishTime)
             flow.bw = flow.flowSize / flowTransTime
         # print bandwidth (in Mbps) in each line with sorted format
         bwList = [flow.bw for flow in self.finishedFlows]
