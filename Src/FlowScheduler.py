@@ -57,32 +57,31 @@ class FlowScheduler:
         bw = 1.0 * Gb
         for linkId in pathInLink:
             link = self.Links[linkId]
-            if link.scheduling == 'maxmin':
-                curBw = link.linkCap / len(link.flowIds)
-            elif link.scheduling == 'wfq':
-                # Active queues
-                # Shares of this flow's queue
-                # share = bw * weightOwnQ / sumActiveWeights
-                # Share of this flow in its queue
-                #curBw = share / len(flowsInSameQueue)
-                pass
-            elif link.scheduling == 'sp':
-                highest = max(link.flowIds, key=lambda x: x.priority)
-                if flow.priority == highest.priority:
-                    all_highest = [f for f in link.flowIds if f.priority == highest.priority]
-                    curBw = link.linkCap / len(all_highest)
-                else:
-                    curBw = 0.0001 # to avoid division by zero errors
+            # if link.scheduling == 'maxmin':
+            #     curBw = link.linkCap / len(link.flowIds)
+            # elif link.scheduling == 'wfq':
+            #     # Active queues
+            #     # Shares of this flow's queue
+            #     # share = bw * weightOwnQ / sumActiveWeights
+            #     # Share of this flow in its queue
+            #     #curBw = share / len(flowsInSameQueue)
+            #     pass
+            # elif link.scheduling == 'sp':
+            #     highest = max(link.flowIds, key=lambda x: x.priority)
+            #     if flow.priority == highest.priority:
+            #         all_highest = [f for f in link.flowIds if f.priority == highest.priority]
+            #         curBw = link.linkCap / len(all_highest)
+            #     else:
+            #         curBw = 0.0001 # to avoid division by zero errors
+            curBw = link.UpdateRates(flow)
 
             if bw > curBw:
                 bw = curBw
-        #TODO: work conserving
-        #wastingFlows = self.runningFlows
-        #while len(wastingFlows) > 0:
+        # TODO: work conserving
+        # wastingFlows = self.runningFlows
+        # while len(wastingFlows) > 0:
         #    for wf in wastingFlows:
         #        wfbw = wf.bw
-        #        wfbw
-
         flow.bw = bw
         flow.finishTime = curTime + flow.remainSize / bw
 
@@ -96,9 +95,11 @@ class FlowScheduler:
             link = self.Links[linkId]
             if flag == "remove":
                 link.flowIds.remove(curFlow.flowId)
+                del link.flowRates[curFlow.flowId]
                 curTime = curFlow.finishTime
             elif flag == "insert":
                 link.flowIds.append(curFlow.flowId)
+                link.flowRates[curFlow.flowId] = 0.00001
                 curTime = curFlow.startTime
         for linkId in pathInLink:
             link = self.Links[linkId]

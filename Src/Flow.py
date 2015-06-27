@@ -56,15 +56,15 @@ class Flow:
         # Constant bit rate flows
         self.cbr = False
 
-        self.transport
+        self.transport = 'tcp'
 
     def SetFlowSize(self, size):
         self.flowSize = size
         self.remainSize = size
 
-    def SetFlowDeadline(self,ddl):
+    def SetFlowDeadline(self, ddl):
         self.deadline = ddl
-        self.remainSize = ddl
+        self.remainTime = ddl
 
     def SerCBR(self, cbr):
         self.bw = cbr
@@ -74,7 +74,7 @@ class Flow:
     # BuildPath() builds a path with pathNodeIds[:]
     def BuildPath(self, pathNodeIds):
         # Build path in node ids
-        #self.pathNodeIds = pathNodeIds[:]
+        # self.pathNodeIds = pathNodeIds[:]
         self.pathNodeIds = pathNodeIds
         # Build path in link ids
         # Append tuple of nodes as links.

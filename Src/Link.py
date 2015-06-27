@@ -19,7 +19,7 @@ class Link:
 
         self.flowRates = dict()
 
-        # Scheduling strtegy of this link
+        # Scheduling strategy of this link
         # Weight fair queueing, strict priority queueing, Max-min Fair (Default)
         self.scheduling = 'maxmin'
 
@@ -33,8 +33,30 @@ class Link:
             print("Error: " + sched + ' is unavailable. Try \'maxmin\', \'wfq\', or \'sp\'')
 
     def UpdateRates(self, flow):
-        #TODO: assign rates to all flows, and return the rate of input flow
-        return self.flowRates[flow]
+        # Assign rates to all flows, and return the rate of input flow
+        if self.scheduling == 'maxmin':
+            curBw = self.linkCap / len(self.flowIds)
+        elif self.scheduling == 'wfq':
+            # Active queues
+            # Shares of this flow's queue
+            # share = bw * weightOwnQ / sumActiveWeights
+            # Share of this flow in its queue
+            # curBw = share / len(flowsInSameQueue)
+            pass
+        elif self.scheduling == 'sp':
+            # highest = max(self.flowIds, key=lambda x: x.priority)
+            # if flow.priority == highest.priority:
+            #   all_highest = [f for f in self.flowIds if f.priority == highest.priority]
+            #    curBw = self.linkCap / len(all_highest)
+            # else:
+            #    curBw = 0.0001 # to avoid division by zero errors
+            pass
+
+        for fid in self.flowIds:
+            self.flowRates[fid] = curBw
+
+        # self.flowRates[flow] = curBw
+        return self.flowRates[flow.flowId]
 
     def __del__(self):
         pass
