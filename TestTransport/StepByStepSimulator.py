@@ -16,12 +16,13 @@ class StepByStepSimulator:
     def __init__(self,
                  RTT=0.000001*80,
                  SIMTIME=0.1,
-                 CONCURRENCY=10,
+                 CONCURRENCY=5,
                  FLOWSIZEMEAN=0.5,
                  FLOWDDLMEAN = 0.001*50,
                  ECN=64,
                  MAXBUFFER=12,
-                 LINKCAP=10):
+                 LINKCAP=10,
+                 output='results.txt'):
         self.RTT = RTT
         self.SIMTIME = SIMTIME
         self.Steps = int(round(SIMTIME / RTT))
@@ -36,6 +37,8 @@ class StepByStepSimulator:
         self.LINKCAP = LINKCAP * KB
         self.LINK = Link.Link(1)
         self.LINK.linkCap = LINKCAP  # 1Gbps link
+
+        self.fname = output
 
     def geninput(self):
         # Return a list of flows
@@ -53,11 +56,6 @@ class StepByStepSimulator:
             flow.SetFlowDeadline(ddlinsteps)
             # print 'flow {} time for choice: {}'.format(fid, (Steps - flow.deadline))
             flow.startTime = random.choice(range(self.Steps - flow.deadline))
-            # choicerange = range(Steps - flow.deadline)
-            # weights = [abs(c-Steps+1) for c in choicerange]
-            # choices = dict(zip(choicerange,weights))
-            # flow.startTime = WeightedChoice.weighted_choice(choices)
-
             # initial window
             flow.bw = 10*PKTSIZE/self.RTT
             flow.residualRate = 0
@@ -87,7 +85,7 @@ class StepByStepSimulator:
                     cWin = cWin*(1 - (CongestionPercentage**Urgency)/2.0)
                 except:
                     print 'alpha = {}, urgency = {}'.format(CongestionPercentage, Urgency)
-                    sys.exit("aa! errors!")
+                    sys.exit("errors!")
                 flow.bw = cWin/self.RTT
             else:
                 flow.bw += (PKTSIZE/self.RTT)
@@ -106,8 +104,7 @@ class StepByStepSimulator:
         # create inputs
         Flows = self.geninput()
 
-        fname = 'results.txt'
-        open(fname, 'w').close()
+        open(self.fname, 'w').close()
 
         for proto in PROTO:
             for f in Flows:
@@ -117,7 +114,6 @@ class StepByStepSimulator:
 
             Flows.sort(key=lambda f: f.startTime)
             ReadyFlow = Flows
-            print len(ReadyFlow)
             ActiveFlow = []
             DeadFlow = []
             MissFlow = []
@@ -170,7 +166,7 @@ class StepByStepSimulator:
                         MissFlow.append(f)
                         ActiveFlow.remove(f)
 
-            with open(fname, "a") as f:
+            with open(self.fname, "a") as f:
                 f.write('{}: Total number of flows: {}\n'.format(proto, len(Flows)))
                 f.write('{}: Completed flows: {}\n'.format(proto, len(DeadFlow)))
                 f.write('{}: Missed flows: {}\n'.format(proto, len(MissFlow)))
