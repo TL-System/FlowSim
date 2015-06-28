@@ -9,6 +9,10 @@ class Link:
 
     def __init__(self, id):
         # link ID is named as tuple of (start node id, destination node id)
+        """
+
+        :rtype : int
+        """
         self.linkId = id
 
         # link capacity
@@ -22,6 +26,8 @@ class Link:
         # Scheduling strategy of this link
         # Weight fair queueing, strict priority queueing, Max-min Fair (Default)
         self.scheduling = 'maxmin'
+
+        self.queue = 0.0
 
     def SetCap(self, cap):
         self.linkCap = float(cap * Gb)

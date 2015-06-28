@@ -52,6 +52,7 @@ class Flow:
         # Deadline
         self.deadline = -1
         self.remainTime = -1
+        self.residualRate = -1.0
 
         # Constant bit rate flows
         self.cbr = False
