@@ -15,14 +15,15 @@ MB = 1024.0 * KB
 RTT = 0.000001 * 80 # 80 us
 SIMTIME = 0.1
 Steps = int(round(SIMTIME / RTT))
-MAXNUMFLOW = 5 * Steps # This is concurrency of flows
-FLOWSIZEMEAN = 1 * MB
+MAXNUMFLOW = 10 * Steps # This is concurrency of flows
+FLOWSIZEMEAN = 0.5 * MB
 PKTSIZE = 1.5 * KB
 FLOWDDLMEAN = 0.001 * 50
 PROTO = ['d2tcp', 'mcp', 'tcp', 'dctcp']
 # PROTO = ['d2tcp']
 # ECN Threshold
 ECN = 64 * PKTSIZE
+MAXBUFFER = 12 * MB
 
 LINK = Link.Link(1)
 LINK.linkCap = 10 * KB  # 1Gbps link
@@ -61,18 +62,18 @@ def Rate(flow, CongestionPercentage, LinkQueue):
             cWin = cWin*(1 - CongestionPercentage/2.0)
             flow.bw = cWin/RTT
         else:
-            flow.bw += (PKTSIZE/RTT)
+            flow.bw += 0.1*(PKTSIZE/RTT)
     elif flow.transport == 'tcp':
         if CongestionPercentage > 0.002:
             cWin = flow.bw * RTT
             cWin /= 2.0
             flow.bw = cWin/RTT
         else:
-            flow.bw += (PKTSIZE/RTT)
+            flow.bw += 0.1*(PKTSIZE/RTT)
     elif flow.transport == 'd2tcp':
         if CongestionPercentage > 0.002:
             cWin = flow.bw * RTT
-            Urgency = min(2.0, flow.remainSize/flow.remainTime)
+            Urgency = max(0, min(5.0, flow.remainSize/flow.remainTime))
             try:
                 cWin = cWin*(1 - (CongestionPercentage**Urgency)/2.0)
             except:
@@ -85,7 +86,8 @@ def Rate(flow, CongestionPercentage, LinkQueue):
         cWin = flow.bw * RTT
         ExpectedRate = flow.remainSize/flow.remainTime
         SourceTerm = flow.residualRate * ExpectedRate / flow.bw
-        NetworkTerm = LinkQueue / LINK.linkCap
+        V = 1
+        NetworkTerm = V * LinkQueue / LINK.linkCap
         delta = RTT * (SourceTerm - NetworkTerm)
         cWin += delta
         flow.bw = cWin/RTT
@@ -100,6 +102,8 @@ open(fname, 'w').close()
 for proto in PROTO:
     for f in Flows:
         f.transport = proto
+        if proto == 'dctcp' or proto == 'tcp':
+            f.bw = PKTSIZE/RTT
 
     Flows.sort(key=lambda f: f.startTime)
     ReadyFlow = Flows
@@ -120,22 +124,27 @@ for proto in PROTO:
         InputLoad = sum([f.bw for f in ActiveFlow])
         print 'Input load is {}'.format(InputLoad)
         LINK.queue += (InputLoad * RTT - LINK.linkCap)
+        csize = 0.001
+        dropsize = 0.001
         if (LINK.queue - ECN) < 0:
             LINK.queue = 0.001
-            csize = 0.001
         else:
-            LINK.queue = min(12 * MB, LINK.queue)
+            # LINK.queue = min(12 * MB, LINK.queue)
             csize = max(0.001, LINK.queue - ECN)
+            dropsize = max(0.001, LINK.queue - MAXBUFFER)
+            LINK.queue = min(MAXBUFFER, LINK.queue)
         print 'Queue is {}'.format(LINK.queue)
 
         for f in ActiveFlow:
+            cpercent = max(0.001, min(1, f.bw*RTT/csize))
             if f.remainTime > 0:
-                f.bw = Rate(f, max(0.001, min(1, f.bw*RTT/csize)), LINK.queue)
+                f.bw = Rate(f, cpercent, LINK.queue)
                 f.residualRate += f.remainSize/f.remainTime - f.bw
                 f.residualRate = max(0.001, f.residualRate)
             # print 'flow {} rate {}'.format(f.flowId, f.bw)
             f.bw = max(0.001, f.bw)
-            f.remainSize -= f.bw * RTT
+            droprate = 1
+            f.remainSize = min(f.remainSize, f.remainSize - f.bw * RTT + droprate * cpercent * dropsize)
             f.remainTime -= 1
 
         for f in ActiveFlow:
