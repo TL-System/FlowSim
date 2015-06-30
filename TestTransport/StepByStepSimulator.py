@@ -18,14 +18,14 @@ PROTO = ['d2tcp', 'mcp', 'tcp', 'dctcp']
 class StepByStepSimulator:
     # setting up environment
     def __init__(self,
-                 RTT=0.000001*100,
-                 SIMTIME=0.1,
+                 RTT=0.000001*80,       # 80us
+                 SIMTIME=0.1,           # 1s = 1000ms
                  CONCURRENCY=5,
-                 FLOWSIZEMEAN=0.5,
-                 FLOWDDLMEAN=0.001*50,
-                 ECN=64,
-                 MAXBUFFER=12,
-                 LINKCAP=10,
+                 FLOWSIZEMEAN=0.1,      # 0.1MB = 100KB 0.1MB/100ms=100KB/100ms=8000bps=8Gbps
+                 FLOWDDLMEAN=0.001*50,  # 50ms
+                 ECN=64,                # 64 packets
+                 MAXBUFFER=12,          # 12MB
+                 LINKCAP=10,            # 1Gbps
                  output='results.txt'):
         self.RTT = RTT
         self.SIMTIME = SIMTIME
@@ -33,13 +33,15 @@ class StepByStepSimulator:
         self.MAXNUMFLOW = CONCURRENCY * self.Steps  # This is concurrency of flows
         self.FLOWSIZEMEAN = FLOWSIZEMEAN * MB
         self.FLOWDDLMEAN = FLOWDDLMEAN
-
+        # self.FLOWDDLMEAN = 1*CONCURRENCY*FLOWSIZEMEAN/(LINKCAP*KB/RTT)
         # ECN Threshold
         self.ECN = ECN * PKTSIZE
         self.MAXBUFFER = MAXBUFFER * MB
         self.LINKCAP = LINKCAP * KB
         self.LINK = Link.Link(1)
-        self.LINK.linkCap = LINKCAP  # 1Gbps link
+        self.LINK.linkCap = self.LINKCAP
+        # 1 Gbps = 1 G(1/8)Bps = (1/8)*1024*MB/s = 128MB/((1s/80us)*80us) = 128 MB/ (125*10^2 * 80us)
+        #        = (128/125)*10^-2*MB/RTT = 10*(128/125)*KB/RTT ~ 10KB/RTT
 
         self.fname = output
 
@@ -66,7 +68,6 @@ class StepByStepSimulator:
         return flowlist
 
     def Rate(self, flow, CongestionPercentage, LinkQueue):
-
         if flow.transport == 'dctcp':
             if CongestionPercentage > 0.002:
                 cWin = flow.bw * self.RTT
@@ -97,9 +98,9 @@ class StepByStepSimulator:
             cWin = flow.bw * self.RTT
             ExpectedRate = flow.remainSize/flow.remainTime
             SourceTerm = flow.residualRate * ExpectedRate / flow.bw
-            V = 1
-            NetworkTerm = V * LinkQueue / self.LINK.linkCap
-            delta = self.RTT * (SourceTerm - NetworkTerm)
+            V = 0.5
+            NetworkTerm = V * LinkQueue / self.LINKCAP
+            delta = self.RTT * SourceTerm - NetworkTerm
             cWin += delta
             flow.bw = cWin/self.RTT
         return flow.bw
@@ -129,8 +130,10 @@ class StepByStepSimulator:
                     ActiveFlow += newflows
 
                 InputLoad = sum([f.bw for f in ActiveFlow])
-                # print 'Input load is {}'.format(InputLoad)
-                self.LINK.queue += (InputLoad * self.RTT - self.LINK.linkCap)
+                print 'Input load is {}'.format(InputLoad)
+                self.LINK.queue += (InputLoad * self.RTT - self.LINKCAP)
+                if self.LINK.queue < 0:
+                    self.LINK.queue = 0
                 csize = 0.001
                 dropsize = 0.001
                 if self.LINK.queue <= self.ECN:
@@ -138,8 +141,9 @@ class StepByStepSimulator:
                 elif self.LINK.queue <= self.MAXBUFFER:
                     csize = self.LINK.queue - self.ECN
                 else:
-                    csize = self.LINK.queue - self.ECN
+                    csize = self.MAXBUFFER - self.ECN
                     dropsize = self.LINK.queue - self.MAXBUFFER
+                    self.LINK.queue = self.MAXBUFFER
                 print 'Queue is {}'.format(self.LINK.queue)
 
                 for f in ActiveFlow:
@@ -150,9 +154,9 @@ class StepByStepSimulator:
                         f.residualRate = max(0.001, f.residualRate)
                     # print 'flow {} rate {}'.format(f.flowId, f.bw)
                     f.bw = max(0.001, f.bw)
-                    droprate = 0.5
-                    f.remainSize = min(f.remainSize, f.remainSize - f.bw * self.RTT\
-                                       + droprate * cpercent * dropsize)
+                    dropperc = max(0.000001, min(1, abs(f.bw*self.RTT/dropsize)))
+                    f.remainSize = min(f.remainSize, f.remainSize - f.bw * self.RTT
+                                       + dropperc * dropsize)
                     f.remainTime -= 1
 
                 for f in ActiveFlow:
@@ -170,11 +174,11 @@ class StepByStepSimulator:
             with open(self.fname, "a") as f:
                 f.write('{}: Total number of flows: {}\n'.format(proto, len(Flows)))
                 f.write('{}: Completed flows: {}\n'.format(proto, len(DeadFlow)))
-                f.write('{}: Missed flows: {}\n'.format(proto, len(MissFlow)))
-                f.write('{}: Miss Rate: {}\n'.format(proto, 1.0*len(MissFlow)/len(Flows)))
+                f.write('{}: Missed flows: {}\n'.format(proto, len(MissFlow)+len(ActiveFlow)))
+                f.write('{}: Miss Rate: {}\n'.format(proto, 100.0*(len(MissFlow)+len(ActiveFlow))/len(Flows)))
                 f.write('\n')
                 f.close()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     sim = StepByStepSimulator()
     sim.run()
