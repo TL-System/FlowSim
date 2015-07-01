@@ -96,12 +96,12 @@ class StepByStepSimulator:
                 flow.bw += (PKTSIZE/self.RTT)
         elif flow.transport == 'mcp':
             cWin = flow.bw * self.RTT
-            ExpectedRate = flow.remainSize/flow.remainTime
+            ExpectedRate = flow.remainSize / flow.remainTime
             SourceTerm = flow.residualRate * ExpectedRate / flow.bw
             V = 0.5
             NetworkTerm = V * LinkQueue / self.LINKCAP
             delta = self.RTT * SourceTerm - NetworkTerm
-            cWin += delta
+            cWin = max(PKTSIZE/self.RTT, cWin + delta)
             flow.bw = cWin/self.RTT
         return flow.bw
 
