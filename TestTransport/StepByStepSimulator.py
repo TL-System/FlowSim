@@ -72,7 +72,7 @@ class StepByStepSimulator:
             flowlist.append(flow)
         return flowlist
 
-    def Rate(self, flow, CongestionPercentage, LinkQueue):
+    def rate(self, flow, CongestionPercentage, LinkQueue):
         if flow.transport == 'dctcp':
             if CongestionPercentage > 0:
                 cWin = flow.bw * self.RTT
@@ -156,7 +156,7 @@ class StepByStepSimulator:
                     f.remainSize = min(f.remainSize, f.remainSize - f.bw * self.RTT
                                        + dropperc * dropsize)
                     if f.remainTime > 0:
-                        f.bw = self.Rate(f, cpercent, self.LINK.queue)
+                        f.bw = self.rate(f, cpercent, self.LINK.queue)
                         f.residualRate += f.remainSize / f.remainTime - f.bw
                         f.residualRate = max(0.001, f.residualRate)
                     # print 'flow {} rate {}'.format(f.flowId, f.bw)
