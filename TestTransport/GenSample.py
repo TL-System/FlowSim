@@ -21,6 +21,6 @@ for f in flows:
 with open('Out/flowdump.json', 'wb') as f:
     flowdump = json.dump(flowdict, f)
 
-# print json.dumps(flowdict, sort_keys=True, indent=4, separators=(',', ': '))
+print json.dumps(flowdict, sort_keys=True, indent=4, separators=(',', ': '))
 
-# TODO: next step is to create a small scenario with only 10 or less flows to get a good example for mcp
+# TODO: next step is to creaate a small scenario with only 10 or less flows to get a good example for mcp
