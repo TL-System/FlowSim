@@ -1,0 +1,11 @@
+mcp_flow_id,mcp_deadline,mcp_flowSize,mcp_startTime,mcp_finishTime,mcp_fct,d2tcp_flow_id,d2tcp_deadline,d2tcp_flowSize,d2tcp_startTime,d2tcp_finishTime,d2tcp_fct,dctcp_flow_id,dctcp_deadline,dctcp_flowSize,dctcp_startTime,dctcp_finishTime,dctcp_fct,tcp_flow_id,tcp_deadline,tcp_flowSize,tcp_startTime,tcp_finishTime,tcp_fct
+8,1,5,4,5,1,6,2,5,3,5,2,6,2,5,3,5,2,6,2,5,3,5,2
+0,5,5,0,1,1,7,2,5,3,4,1,7,2,5,3,4,1,7,2,5,3,4,1
+1,5,5,0,2,2,8,1,5,4,7,3,8,1,5,4,7,3,8,1,5,4,7,3
+3,4,5,1,2,1,0,5,5,0,2,2,0,5,5,0,2,2,0,5,5,0,2,2
+2,4,5,1,3,2,1,5,5,0,3,3,1,5,5,0,3,3,1,5,5,0,3,3
+5,3,5,2,3,1,3,4,5,1,3,2,3,4,5,1,3,2,3,4,5,1,3,2
+7,2,5,3,4,1,2,4,5,1,4,3,2,4,5,1,4,3,2,4,5,1,4,3
+9,1,2,4,4,0,5,3,5,2,4,2,5,3,5,2,4,2,5,3,5,2,4,2
+4,3,5,2,5,3,9,1,2,4,4,0,9,1,2,4,4,0,9,1,2,4,4,0
+6,2,5,3,6,3,4,3,5,2,6,4,4,3,5,2,6,4,4,3,5,2,6,4
