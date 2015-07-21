@@ -1,0 +1,12 @@
+{
+	"0":{"flowSize": 5, "deadline": 5, "startTime": 0},
+	"1":{"flowSize": 5, "deadline": 5, "startTime": 0},
+	"2":{"flowSize": 5, "deadline": 4, "startTime": 1},
+	"3":{"flowSize": 5, "deadline": 4, "startTime": 1},
+	"4":{"flowSize": 5, "deadline": 3, "startTime": 2},
+	"5":{"flowSize": 5, "deadline": 3, "startTime": 2},
+	"6":{"flowSize": 5, "deadline": 2, "startTime": 3},
+	"7":{"flowSize": 5, "deadline": 2, "startTime": 3},
+	"8":{"flowSize": 5, "deadline": 1, "startTime": 4},
+	"9":{"flowSize": 2, "deadline": 1, "startTime": 4}
+}

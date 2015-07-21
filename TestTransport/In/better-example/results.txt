@@ -1,0 +1,28 @@
+tcp: Total number of flows: 10
+tcp: Completed flows: 7
+tcp: Missed flows: 3
+tcp: Miss Rate: 30.0
+Missed Flows: 6 7 8 
+Unfinished Flows: 
+
+mcp: Total number of flows: 10
+mcp: Completed flows: 9
+mcp: Missed flows: 1
+mcp: Miss Rate: 10.0
+Missed Flows: 8 
+Unfinished Flows: 
+
+d2tcp: Total number of flows: 10
+d2tcp: Completed flows: 7
+d2tcp: Missed flows: 3
+d2tcp: Miss Rate: 30.0
+Missed Flows: 6 7 8 
+Unfinished Flows: 
+
+dctcp: Total number of flows: 10
+dctcp: Completed flows: 7
+dctcp: Missed flows: 3
+dctcp: Miss Rate: 30.0
+Missed Flows: 6 7 8 
+Unfinished Flows: 
+
