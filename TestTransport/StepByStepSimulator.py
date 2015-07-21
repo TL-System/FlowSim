@@ -4,6 +4,7 @@ import random
 import sys
 from datetime import datetime
 import csv
+import json
 
 from Src import Flow, Link
 from TUnits import *
@@ -26,7 +27,8 @@ class StepByStepSimulator:
                  ecn=64,                # 64 packets
                  maxbuffer=4,           # 4MB
                  linkcap=1000,          # BDP = 10KB -> 1Gbps
-                 output='results.txt'):
+                 output='results.txt',
+                 inputf=''):            # assuming txt file
         self.RTT = rtt
         self.SIMTIME = simtime
         self.Steps = int(round(simtime / rtt))
@@ -49,26 +51,45 @@ class StepByStepSimulator:
         self.mcpwins = False
         # clear outputs
         open('Out/'+self.fname, 'w').close()
+        if inputf == '':
+            self.hasInput = False
+        else:
+            self.hasInput = True
+            self.inputf = inputf
 
     def geninput(self):
         # Return a list of flows
         flowlist = []
         # print 'Generating input'
-        for fid in range(self.MAXNUMFLOW):
-            flow = Flow.Flow()
-            flow.flowId = fid
-            flow.SetFlowSize(round(random.expovariate(1 / self.FLOWSIZEMEAN)))
-            # deadline is in number of RTTs
-            ddlinsteps = int(round(random.expovariate(1 / self.FLOWDDLMEAN) / self.RTT))
-            while ddlinsteps >= self.Steps - 1:
+        if not self.hasInput:
+            for fid in range(self.MAXNUMFLOW):
+                flow = Flow.Flow()
+                flow.flowId = fid
+                flow.SetFlowSize(round(random.expovariate(1 / self.FLOWSIZEMEAN)))
+                # deadline is in number of RTTs
                 ddlinsteps = int(round(random.expovariate(1 / self.FLOWDDLMEAN) / self.RTT))
-            flow.SetFlowDeadline(ddlinsteps)
-            # print 'flow {} time for choice: {}'.format(fid, (Steps - flow.deadline))
-            flow.startTime = random.choice(range(self.Steps - flow.deadline))
-            # initial window
-            flow.bw = 10 * PKTSIZE / self.RTT
-            flow.residualRate = 0
-            flowlist.append(flow)
+                while ddlinsteps >= self.Steps - 1:
+                    ddlinsteps = int(round(random.expovariate(1 / self.FLOWDDLMEAN) / self.RTT))
+                flow.SetFlowDeadline(ddlinsteps)
+                # print 'flow {} time for choice: {}'.format(fid, (Steps - flow.deadline))
+                flow.startTime = random.choice(range(self.Steps - flow.deadline))
+                # initial window
+                flow.bw = 10 * PKTSIZE / self.RTT
+                flow.residualRate = 0
+                flowlist.append(flow)
+        else:
+            with open(self.inputf) as inputf:
+                tempflows = json.load(inputf)
+            for i in range(len(tempflows)):
+                flow = Flow.Flow()
+                flow.flowId = i
+                flow.SetFlowSize(tempflows['{}'.format(i)]['flowSize'])
+                flow.SetFlowDeadline(tempflows['{}'.format(i)]['deadline'])
+                flow.startTime = tempflows['{}'.format(i)]['startTime']
+                flow.bw = 10 * PKTSIZE / self.RTT
+                flow.residualRate = 0
+                flowlist.append(flow)
+
         return flowlist
 
     def rate(self, flow, CongestionPercentage, LinkQueue, AggRate):
@@ -163,16 +184,19 @@ class StepByStepSimulator:
                     f.remainTime -= 1
 
                 for f in ActiveFlow:
-                    if f.remainSize <= 0.0 and f.remainTime >= 0:
+                    if f.remainSize < 0.0 and f.remainTime >= 0:
                         # print 'flow {} is finished at {}'.format(f.flowId, t)
                         f.finishTime = t
                         DeadFlow.append(f)
                         ActiveFlow.remove(f)
                     elif f.remainSize > 0 and f.remainTime <= 0:
                         # print 'flow {} missed deadline at {}'.format(f.flowId, t)
-                        f.finishTime = -1 # unfinished
+                        f.finishTime = t # unfinished
                         MissFlow.append(f)
                         ActiveFlow.remove(f)
+
+            for af in ActiveFlow:
+                af.finishTime = t
 
             self.missrate[proto] = 100.0 * (len(MissFlow) + len(ActiveFlow)) / len(Flows)
             with open('Out/'+self.fname, "ab") as f:
@@ -180,10 +204,19 @@ class StepByStepSimulator:
                 f.write('{}: Completed flows: {}\n'.format(proto, len(DeadFlow)))
                 f.write('{}: Missed flows: {}\n'.format(proto, len(MissFlow) + len(ActiveFlow)))
                 f.write('{}: Miss Rate: {}\n'.format(proto, self.missrate[proto]))
+                f.write('Missed Flows: ')
+                for mf in MissFlow:
+                    f.write('{} '.format(mf.flowId))
+                f.write('\n')
+                f.write('Unfinished Flows: ')
+                for df in ActiveFlow:
+                    f.write('{} '.format(df.flowId))
+                f.write('\n')
                 f.write('\n')
                 f.close()
 
-            dt = datetime.now()
+            # dt = datetime.now()
+            dt = ''
             with open('In/{}'.format(proto) + str(dt) + '.csv', 'wb') as csvfile:
                 flowwriter = csv.writer(csvfile)
                 flowwriter.writerow(['flow_id', 'deadline', 'flowSize', 'startTime', 'finishTime', 'fct'])
@@ -208,11 +241,12 @@ if __name__ == "__main__":
     Rtt = 0.001
     sim = StepByStepSimulator(
         rtt=Rtt,
-        simtime=Rtt*5,
+        simtime=Rtt*10,
         concurrency=2,
         flowsizemean=0.002,
         flowddlmean=1*Rtt,
-        linkcap=100)
+        linkcap=100,
+        inputf='Out/flow10.json')
     # when in doubt, use brute force
     sim.run()
     # count = 0

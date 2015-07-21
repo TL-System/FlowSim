@@ -1,0 +1,7 @@
+{
+	"0":{"finishTime": 0.0, "flowSize": 5, "deadline": 4, "startTime": 1},
+	"1":{"finishTime": 0.0, "flowSize": 2, "deadline": 3, "startTime": 1},
+	"2":{"finishTime": 0.0, "flowSize": 2, "deadline": 3, "startTime": 2},
+	"3":{"finishTime": 0.0, "flowSize": 5, "deadline": 4, "startTime": 2},
+	"4":{"finishTime": 0.0, "flowSize": 5, "deadline": 5, "startTime": 3}
+}
