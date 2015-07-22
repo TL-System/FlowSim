@@ -42,6 +42,9 @@ class Simulator:
             pathNodeIds = self.routing.GetPath(flow.startId, flow.endId)
             flow.BuildPath(pathNodeIds)
 
+    def AssignLoadBalancer(self, LoadBalancer, args):
+        self.lb = LoadBalancer()
+
     def Run(self):
         """
         Fire up the simulator. The function calculates the transferring time for each flow.
@@ -54,7 +57,6 @@ class Simulator:
             while self.sched.runningFlows:
                 # the first flow is with earliest finishTime
                 toFinishFlow = self.sched.runningFlows[0]
-
                 if toFinishFlow.finishTime <= curStartFlow.startTime:
                     # remove this flow from running flows
                     self.sched.runningFlows.remove(toFinishFlow)
@@ -70,6 +72,7 @@ class Simulator:
             self.sched.runningFlows.append(curStartFlow)
             # Update related flow's transfer time in removing a flow
             # TODO: before inserting, do load banlance
+            self.lb(curStartFlow)
             # Step 1 find out which spine is less loaded
             # Less loaded in terms of more flows
             # Step 2 set the flow's spine to the less loaded spine
