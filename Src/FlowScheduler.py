@@ -20,13 +20,20 @@ class FlowScheduler:
         self.finishedFlows = []
 
         # Topology Links. This should not be there. I will remove it in future version.
-        self.Links = []
+        # self.Links = []
+        # self.Nodes = []
 
     def AssignLinks(self, links):
         """
         Need links to update flow info
         """
         self.Links = links
+
+    def AssignNodes(self, nodes):
+        """
+        Need links to update flow info
+        """
+        self.Nodes = nodes
 
     def AssignFlows(self):
         """
@@ -74,7 +81,6 @@ class FlowScheduler:
             #     else:
             #         curBw = 0.0001 # to avoid division by zero errors
             curBw = link.UpdateRates(flow)
-
             if bw > curBw:
                 bw = curBw
         # TODO: work conserving
@@ -106,6 +112,14 @@ class FlowScheduler:
             for flowId in link.flowIds:
                 flow = self.flows[flowId - 1]
                 self.UpdateFlowState(curTime, flow)
+
+        nodeInPath = curFlow.pathNodeIds
+        for nodeId in nodeInPath:
+            node = self.Nodes[nodeId]
+            if flag == "remove":
+                node.flowIds.remove(curFlow.flowId)
+            elif flag == "insert":
+                node.flowIds.append(curFlow.flowId)
 
     def PrintFlows(self):
         """

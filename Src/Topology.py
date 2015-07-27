@@ -11,6 +11,7 @@ class Topology:
         # node list in topology. Node id is also the index in list. node id is start from 1
         self.nodes = []
         # link list in topology. Indexed by the node id pair (start id, end id).
+        # this is a dict
         self.links = {}
 
     def CreateTopology(self):
@@ -53,6 +54,18 @@ class Topology:
         else:
             print "Link id %d is not found" % linkId
             return None
+
+    def GetLinkFlowCount(self, linkId):
+        if linkId in self.links:
+            return len(self.links[linkId].flowIds)
+        else:
+            print "Link id %d is not found" % linkId
+            return None
+
+    def GetLinkOfLeastFlow(self):
+        md = dict([(self.links[l].linkId, len(self.links[l].flowIds))
+                   for l in self.GetLinks()])
+        return min(md, key=md.get)
 
     def GenTopoFromMatrix(self, topoMatrix, n, NodeType, LinkType):
         """

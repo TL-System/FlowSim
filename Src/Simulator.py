@@ -36,6 +36,7 @@ class Simulator:
         self.sched = FlowScheduler()
         self.sched.AssignFlows(args)
         self.sched.AssignLinks(self.topo.GetLinks())
+        self.sched.AssignNodes(self.topo.GetNodes())
         self.flows = self.sched.GetAllFlows()
         for flow in self.flows:
             self.routing.BuildPath(flow.startId, flow.endId)
@@ -71,10 +72,20 @@ class Simulator:
             # insert current start flow to running list
             self.sched.runningFlows.append(curStartFlow)
             # Update related flow's transfer time in removing a flow
-            # TODO: before inserting, do load banlance
-            self.lb(curStartFlow)
+            # self.lb(curStartFlow)
+            # self.topo.GetLinkOfLeastFlow()
             # Step 1 find out which spine is less loaded
+
+            # Hedera load balancing
+            # print self.topo.GetCoreLeastFlow()
+            if self.topo.GetCoreLeastFlow() not in curStartFlow.pathNodeIds:
+                if len(curStartFlow.pathNodeIds) == 5:
+                    curStartFlow.pathLinkIds[1] = (curStartFlow.pathLinkIds[1][0], self.topo.GetCoreLeastFlow())
+                    curStartFlow.pathLinkIds[2] = (self.topo.GetCoreLeastFlow(), curStartFlow.pathLinkIds[2][1])
+                    curStartFlow.pathNodeIds[2] = self.topo.GetCoreLeastFlow()
+                    #print curStartFlow.pathNodeIds
             # Less loaded in terms of more flows
+
             # Step 2 set the flow's spine to the less loaded spine
             self.sched.UpdateFlow(curStartFlow, "insert")
             # Resort runningFlows by endTime

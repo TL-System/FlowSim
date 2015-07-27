@@ -1,5 +1,6 @@
 __author__ = 'lich'
 
+
 # This file describes the base class of Routing
 # All the specific routing class should inherit from this class
 
@@ -14,6 +15,7 @@ class Routing:
         This method build path for each pair of nodes in topo.
         This is the core component since it indicates the routing mechanism: how to build path bewteen a source and a destination.
         """
+
     def BuildPath(self, srcId, dstId):
         """
         This method can be inherited as requiring.
@@ -59,7 +61,6 @@ class Routing:
                         self.pathList[curNodeId, adjId] = self.pathList[curNodeId, visitNodeId][:]
                         self.pathList[curNodeId, adjId].append(adjId)
                         queue.append(adjNode)
-
 
     def __del__(self):
         pass

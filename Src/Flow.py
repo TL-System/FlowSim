@@ -41,7 +41,8 @@ class Flow:
 
         # Job Id: this flow may be contained by a job
         # Each flow is only contained by one job and one
-        # a job have many tasks, a task has many coflows, a asdcoflow has many flows.
+        # a job have many tasks, a task has many coflows,
+        # a coflow has many flows.
         self.jobId = 0
         self.taskId = 0
         self.coflowId = 0
@@ -56,7 +57,6 @@ class Flow:
 
         # Constant bit rate flows
         self.cbr = False
-
         self.transport = 'tcp'
 
     def SetFlowSize(self, size):

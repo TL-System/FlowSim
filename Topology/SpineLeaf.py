@@ -1,6 +1,7 @@
 __author__ = 'lich'
 
 import sys
+
 sys.path.append("..")
 
 from Src.Topology import *
@@ -11,6 +12,7 @@ from math import ceil, floor
 SERVER = 6
 TOR = 8
 CORE = 2
+
 
 class SpineLeaf(Topology):
     def __init__(self, s=SERVER, t=TOR, c=CORE):
@@ -33,31 +35,31 @@ class SpineLeaf(Topology):
         It indicates n1 --- n2 will translate into to edges: (1, 2) and (2, 1)
         """
         # add links between servers and tors
-        for s in range(1, self.numOfServers+1):
+        for s in range(1, self.numOfServers + 1):
             # Get the tor that server s is connected to
             # 1 to SERVER is connected to (self.numberOfServers + 1)
             t = self.numOfServers + int(ceil(float(s) / self.serverPerRack))
-            # print s, self.serverPerRack, ceil(s / self.serverPerRack), floor(s/self.serverPerRack), int(ceil(float(s) / self.serverPerRack))
+            # print s, self.serverPerRack, ceil(s / self.serverPerRack),
+            # floor(s/self.serverPerRack), int(ceil(float(s) / self.serverPerRack))
             self.links[s, t] = Link((s, t))
             self.links[t, s] = Link((t, s))
 
         # add links between tors and cores
-        for t in range(self.numOfServers+1, self.numOfServers+self.numOfToRs+1):
-            for c in range(self.numOfServers+self.numOfToRs+1, self.numOfServers + self.numOfToRs + self.numOfCores + 1):
+        for t in range(self.numOfServers + 1, self.numOfServers + self.numOfToRs + 1):
+            for c in range(self.numOfServers + self.numOfToRs + 1,
+                           self.numOfServers + self.numOfToRs + self.numOfCores + 1):
                 self.links[t, c] = Link((t, c))
                 self.links[c, t] = Link((c, t))
 
     def CreateNodes(self):
-         # node id start from 1
+        # node id start from 1
         self.nodes.append(None)
         # append server node
         # [1, SERVER * TOR] are servers
         self.AddNodes(self.numOfServers)
-
         # append tor switch node
         # [SERVER * TOR + 1, SERVER * TOR + TOR] are leaves
         self.AddNodes(self.numOfToRs)
-
         # append core switch nodes
         # [SERVER * TOR * CORE + TOR + 1, SERVER * TOR * CORE + TOR + CORE] are spines
         self.AddNodes(self.numOfCores)
@@ -65,7 +67,7 @@ class SpineLeaf(Topology):
     # Given id of server, return id of rack
     # server and rack are numbered starting from 0
     def GetRackId(self, serverId):
-        return int(ceil(serverId/SERVER))
+        return int(ceil(serverId / SERVER))
 
     def GetSameRack(self, serverId):
         # return the list of servers in the same rack with serverId
@@ -106,17 +108,26 @@ class SpineLeaf(Topology):
 
     # return corresponding role
     def GetServerNode(self, serverId):
-        nodeId = self.ConvertToNodeId(serverId, SERVER)
+        nodeId = self.ConvertToNodeId(serverId, 0)
         return self.nodes[nodeId]
 
     def GetToRNode(self, torId):
-        nodeId = self.ConvertToNodeId(torId, TOR)
+        nodeId = self.ConvertToNodeId(torId, 1)
         return self.nodes[nodeId]
 
     def GetCoreNode(self, coreId):
-        nodeId = self.ConvertToNodeId(coreId, CORE)
+        nodeId = self.ConvertToNodeId(coreId, 2)
         return self.nodes[nodeId]
 
+    def GetCores(self):
+        return range(self.numOfServers+self.numOfToRs + 1,
+                     self.numOfServers+self.numOfToRs+self.numOfCores + 1)
+
+    def GetCoreLeastFlow(self):
+        cores = self.GetCores()
+        # print "cores {}".format(cores)
+        dc = dict([(c, len(self.nodes[c].flowIds)) for c in cores])
+        return min(dc, key=dc.get)
 
     def __del__(self):
         pass
