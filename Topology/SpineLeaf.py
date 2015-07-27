@@ -11,7 +11,7 @@ from math import ceil, floor
 
 SERVER = 2
 TOR = 8
-CORE = 2
+CORE = 4
 
 
 class SpineLeaf(Topology):
@@ -125,9 +125,11 @@ class SpineLeaf(Topology):
                      self.numOfServers+self.numOfToRs+self.numOfCores + 1)
 
     def GetCoreLeastFlow(self):
-        cores = self.GetCores()
+        cores = []
+        for i in range(self.numOfCores):
+            cores.append(self.GetCoreNode(i))
         # print "cores {}".format(cores)
-        dc = dict([(c, len(self.nodes[c].flowIds)) for c in cores])
+        dc = dict([(c, len(c.flowIds)) for c in cores])
         return min(dc, key=dc.get)
 
     def __del__(self):

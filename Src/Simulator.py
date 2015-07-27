@@ -76,14 +76,15 @@ class Simulator:
             # self.topo.GetLinkOfLeastFlow()
             # Step 1 find out which spine is less loaded
 
-            # Hedera load balancing
+            # Hedera load balancing for spine leaf
             # print self.topo.GetCoreLeastFlow()
             if self.topo.name == "spineleaf":
                 if self.topo.GetCoreLeastFlow() not in curStartFlow.pathNodeIds:
                     if len(curStartFlow.pathNodeIds) == 5:
-                        curStartFlow.pathLinkIds[1] = (curStartFlow.pathLinkIds[1][0], self.topo.GetCoreLeastFlow())
-                        curStartFlow.pathLinkIds[2] = (self.topo.GetCoreLeastFlow(), curStartFlow.pathLinkIds[2][1])
-                        curStartFlow.pathNodeIds[2] = self.topo.GetCoreLeastFlow()
+                        if curStartFlow.coflowId == 0:
+                            self.changeSpine(curStartFlow, self.topo.GetCoreLeastFlow())
+                        else:
+                            self.changeSpine(curStartFlow, self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1))
                         #print curStartFlow.pathNodeIds
                 # Less loaded in terms of more flows
 
@@ -110,3 +111,8 @@ class Simulator:
 
         # Finally, all the flows are finished
         self.sched.PrintFlows()
+
+    def changeSpine(self, curStartFlow, spine):
+        curStartFlow.pathLinkIds[1] = (curStartFlow.pathLinkIds[1][0], spine.nodeId)
+        curStartFlow.pathLinkIds[2] = (spine.nodeId, curStartFlow.pathLinkIds[2][1])
+        curStartFlow.pathNodeIds[2] = spine.nodeId
