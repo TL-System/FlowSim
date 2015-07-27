@@ -26,6 +26,7 @@ class FatTree(Topology):
         self.CalAggrNums()
         # calculate core switch number
         self.CalCoreNums()
+        self.name = "fattree"
 
     def CreateTopology(self):
         # create nodes

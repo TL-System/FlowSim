@@ -32,6 +32,22 @@ class TestFlowScheduler(FlowScheduler):
         FlowScheduler.AssignFlows(self)
         f.close()
 
+    def AssignFlowsCSV(self, filename="Input/trace.csv"):
+        f = open(filename, "r")
+        for line in f.readlines():
+            l = line.rstrip('\r\n').split(',')
+            print l
+            flow = Flow()
+            flow.startId = int(l[0])
+            flow.endId = int(l[2])
+            flow.SetFlowSize(float(l[6]))
+            flow.startTime = float(l[4])
+            flow.coflowId = int(l[5])
+            flow.flowId = len(self.flows) + 1
+            self.flows.append(flow)
+        FlowScheduler.AssignFlows(self)
+        f.close()
+
     def PrintFlows(self):
         f_name = outDir + "S%0.0f_L%d_a%0.1f_out.txt" \
                  % (self.flowSize, self.mean, self.alpha)
@@ -51,3 +67,7 @@ class TestFlowScheduler(FlowScheduler):
             print >> f_plot, "%f\t%f" % (bwList[i] / Mb, float(i + 1) / num)
         f.close()
         f_plot.close()
+
+if __name__ == "__main__":
+    tfs = TestFlowScheduler()
+    tfs.AssignFlowsCSV()

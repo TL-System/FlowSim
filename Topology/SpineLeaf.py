@@ -9,7 +9,7 @@ from Src.Node import *
 from Src.Link import *
 from math import ceil, floor
 
-SERVER = 6
+SERVER = 2
 TOR = 8
 CORE = 2
 
@@ -22,6 +22,7 @@ class SpineLeaf(Topology):
         self.numOfServers = s * t
         self.numOfToRs = t
         self.numOfCores = c
+        self.name = "spineleaf"
 
     def CreateTopology(self):
         # create nodes

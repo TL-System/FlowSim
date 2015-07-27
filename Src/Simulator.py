@@ -78,13 +78,14 @@ class Simulator:
 
             # Hedera load balancing
             # print self.topo.GetCoreLeastFlow()
-            if self.topo.GetCoreLeastFlow() not in curStartFlow.pathNodeIds:
-                if len(curStartFlow.pathNodeIds) == 5:
-                    curStartFlow.pathLinkIds[1] = (curStartFlow.pathLinkIds[1][0], self.topo.GetCoreLeastFlow())
-                    curStartFlow.pathLinkIds[2] = (self.topo.GetCoreLeastFlow(), curStartFlow.pathLinkIds[2][1])
-                    curStartFlow.pathNodeIds[2] = self.topo.GetCoreLeastFlow()
-                    #print curStartFlow.pathNodeIds
-            # Less loaded in terms of more flows
+            if self.topo.name == "spineleaf":
+                if self.topo.GetCoreLeastFlow() not in curStartFlow.pathNodeIds:
+                    if len(curStartFlow.pathNodeIds) == 5:
+                        curStartFlow.pathLinkIds[1] = (curStartFlow.pathLinkIds[1][0], self.topo.GetCoreLeastFlow())
+                        curStartFlow.pathLinkIds[2] = (self.topo.GetCoreLeastFlow(), curStartFlow.pathLinkIds[2][1])
+                        curStartFlow.pathNodeIds[2] = self.topo.GetCoreLeastFlow()
+                        #print curStartFlow.pathNodeIds
+                # Less loaded in terms of more flows
 
             # Step 2 set the flow's spine to the less loaded spine
             self.sched.UpdateFlow(curStartFlow, "insert")
