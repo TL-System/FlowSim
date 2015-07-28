@@ -49,8 +49,6 @@ class SpineLeaf(Topology):
         for t in range(self.numOfServers + 1, self.numOfServers + self.numOfToRs + 1):
             for c in range(self.numOfServers + self.numOfToRs + 1,
                            self.numOfServers + self.numOfToRs + self.numOfCores + 1):
-                if t == 801:
-                    print "tor {}, core {}".format(t, c)
                 self.links[t, c] = Link((t, c))
                 self.links[c, t] = Link((c, t))
 

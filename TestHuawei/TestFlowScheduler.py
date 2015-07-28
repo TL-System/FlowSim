@@ -21,7 +21,7 @@ class TestFlowScheduler(FlowScheduler):
                 flow = Flow()
                 flow.startId = i + int(l[0])
                 flow.endId = i + int(l[2])
-                flow.SetFlowSize(float(l[6])*10)
+                flow.SetFlowSize(float(l[6])*100)
                 flow.startTime = float(l[4])
                 flow.coflowId = int(l[5])
                 flow.flowId = len(self.flows) + 1

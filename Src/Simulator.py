@@ -83,20 +83,20 @@ class Simulator:
 
             # Hedera load balancing for spine leaf
             # print self.topo.GetCoreLeastFlow()
-            if not self.topo.name == "spineleaf":
+            if self.topo.name == "spineleaf":
                 if self.topo.GetCoreLeastFlow() not in curStartFlow.pathNodeIds:
                     if len(curStartFlow.pathNodeIds) == 5:
                         if curStartFlow.coflowId == 0:
                             self.changeSpine(curStartFlow, self.topo.GetCoreLeastFlow())
-                            print "general flow reroute to spine {}".format(self.topo.GetCoreLeastFlow().nodeId)
+                            # print "general flow reroute to spine {}".format(self.topo.GetCoreLeastFlow().nodeId)
                         else:
                             self.changeSpine(curStartFlow,
                                              self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1))
-                            print "coflow reroute to spine {}".format(self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1).nodeId)
+                            # print "coflow reroute to spine {}".format(self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1).nodeId)
                         #print curStartFlow.pathNodeIds
                 # Less loaded in terms of more flows
 
-            print curStartFlow.pathNodeIds
+            # print curStartFlow.pathNodeIds
             self.sched.UpdateFlow(curStartFlow, "insert")
             # Resort runningFlows by endTime
             self.sched.runningFlows.sort(key=lambda x: x.finishTime)
