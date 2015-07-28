@@ -2,6 +2,11 @@ __author__ = 'lich'
 
 from Unit import *
 
+import traceback
+import sys
+
+
+
 # Flow-level simulator written in python.
 # This file describes the design of class Simulator.
 
@@ -78,17 +83,20 @@ class Simulator:
 
             # Hedera load balancing for spine leaf
             # print self.topo.GetCoreLeastFlow()
-            if self.topo.name == "spineleaf":
+            if not self.topo.name == "spineleaf":
                 if self.topo.GetCoreLeastFlow() not in curStartFlow.pathNodeIds:
                     if len(curStartFlow.pathNodeIds) == 5:
                         if curStartFlow.coflowId == 0:
                             self.changeSpine(curStartFlow, self.topo.GetCoreLeastFlow())
+                            print "general flow reroute to spine {}".format(self.topo.GetCoreLeastFlow().nodeId)
                         else:
-                            self.changeSpine(curStartFlow, self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1))
+                            self.changeSpine(curStartFlow,
+                                             self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1))
+                            print "coflow reroute to spine {}".format(self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1).nodeId)
                         #print curStartFlow.pathNodeIds
                 # Less loaded in terms of more flows
 
-            # Step 2 set the flow's spine to the less loaded spine
+            print curStartFlow.pathNodeIds
             self.sched.UpdateFlow(curStartFlow, "insert")
             # Resort runningFlows by endTime
             self.sched.runningFlows.sort(key=lambda x: x.finishTime)

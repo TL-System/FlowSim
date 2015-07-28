@@ -9,9 +9,9 @@ from Src.Node import *
 from Src.Link import *
 from math import ceil, floor
 
-SERVER = 2
-TOR = 8
-CORE = 4
+SERVER = 10
+TOR = 80
+CORE = 40
 
 
 class SpineLeaf(Topology):
@@ -49,6 +49,8 @@ class SpineLeaf(Topology):
         for t in range(self.numOfServers + 1, self.numOfServers + self.numOfToRs + 1):
             for c in range(self.numOfServers + self.numOfToRs + 1,
                            self.numOfServers + self.numOfToRs + self.numOfCores + 1):
+                if t == 801:
+                    print "tor {}, core {}".format(t, c)
                 self.links[t, c] = Link((t, c))
                 self.links[c, t] = Link((c, t))
 
@@ -127,7 +129,7 @@ class SpineLeaf(Topology):
     def GetCoreLeastFlow(self):
         cores = []
         for i in range(self.numOfCores):
-            cores.append(self.GetCoreNode(i))
+            cores.append(self.GetCoreNode(i+1))
         # print "cores {}".format(cores)
         dc = dict([(c, len(c.flowIds)) for c in cores])
         return min(dc, key=dc.get)

@@ -12,19 +12,23 @@ outDir = "Output/"
 
 class TestFlowScheduler(FlowScheduler):
     def AssignFlows(self, filename="Input/trace.csv"):
+        print sum(1 for li in open(filename,'r'))
         f = open(filename, "r")
         for line in f.readlines():
             l = line.rstrip('\r\n').split(',')
-            # print l
-            flow = Flow()
-            flow.startId = int(l[0])
-            flow.endId = int(l[2])
-            flow.SetFlowSize(float(l[6]))
-            flow.startTime = float(l[4])
-            flow.coflowId = int(l[5])
-            flow.flowId = len(self.flows) + 1
-            self.flows.append(flow)
+            for i in range(50):
+                # print l
+                flow = Flow()
+                flow.startId = i + int(l[0])
+                flow.endId = i + int(l[2])
+                flow.SetFlowSize(float(l[6])*10)
+                flow.startTime = float(l[4])
+                flow.coflowId = int(l[5])
+                flow.flowId = len(self.flows) + 1
+                self.flows.append(flow)
+
         FlowScheduler.AssignFlows(self)
+        print len(self.flows)
         f.close()
 
     def PrintFlows(self):
