@@ -14,6 +14,7 @@ class TestFlowScheduler(FlowScheduler):
     def AssignFlows(self, filename="Input/trace.csv"):
         print sum(1 for li in open(filename,'r'))
         f = open(filename, "r")
+        coflowsize = {}
         for line in f.readlines():
             l = line.rstrip('\r\n').split(',')
             for i in range(50):
@@ -24,6 +25,8 @@ class TestFlowScheduler(FlowScheduler):
                 flow.SetFlowSize(float(l[6])*100)
                 flow.startTime = float(l[4])
                 flow.coflowId = int(l[5])
+                if flow.coflowId not in coflowsize:
+                    coflowsize[flow.coflowId] =
                 flow.flowId = len(self.flows) + 1
                 self.flows.append(flow)
 
@@ -56,8 +59,8 @@ class TestFlowScheduler(FlowScheduler):
                 coflowCompletion = coflowEnd - coflowStart
                 coflow[flow.coflowId] = (coflowStart, coflowEnd, coflowCompletion)
 
-        for k, v in coflow:
-            print >> f_coflow, "{}\t{}\t{}\t{}".format(k, v[0], v[1], v[2])
+        for k in coflow:
+            print >> f_coflow, "{}\t{}\t{}\t{}".format(k, coflow[k][0], coflow[k][1], coflow[k][2])
 
         # print bandwidth (in Mbps) in each line with sorted format
         bwList = [flow.bw for flow in self.finishedFlows]

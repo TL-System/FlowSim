@@ -2,11 +2,6 @@ __author__ = 'lich'
 
 from Unit import *
 
-import traceback
-import sys
-
-
-
 # Flow-level simulator written in python.
 # This file describes the design of class Simulator.
 
