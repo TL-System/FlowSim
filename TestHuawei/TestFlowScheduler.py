@@ -1,5 +1,6 @@
 __author__ = 'lich'
 import sys
+import csv
 
 sys.path.append("..")
 
@@ -15,6 +16,7 @@ class TestFlowScheduler(FlowScheduler):
         print sum(1 for li in open(filename,'r'))
         f = open(filename, "r")
         coflowsize = {}
+        coflowwidth = {}
         for line in f.readlines():
             l = line.rstrip('\r\n').split(',')
             for i in range(50):
@@ -26,12 +28,23 @@ class TestFlowScheduler(FlowScheduler):
                 flow.startTime = float(l[4])
                 flow.coflowId = int(l[5])
                 if flow.coflowId not in coflowsize:
-                    coflowsize[flow.coflowId] =
+                    coflowsize[flow.coflowId] = flow.flowSize
+                    coflowwidth[flow.coflowId] = 1
+                else:
+                    coflowsize[flow.coflowId] += flow.flowSize
+                    coflowwidth[flow.coflowId] += 1
                 flow.flowId = len(self.flows) + 1
                 self.flows.append(flow)
 
         FlowScheduler.AssignFlows(self)
         print len(self.flows)
+        f.close()
+
+        f = open("Input/coflow_in.csv","w")
+        writer = csv.writer(f)
+        writer.writerow(['id', 'volume', 'count'])
+        for k in coflowsize:
+            writer.writerow([k, coflowsize[k], coflowwidth[k]])
         f.close()
 
     def PrintFlows(self):
@@ -75,4 +88,4 @@ class TestFlowScheduler(FlowScheduler):
 
 if __name__ == "__main__":
     tfs = TestFlowScheduler()
-    tfs.AssignFlowsCSV()
+    tfs.AssignFlows()
