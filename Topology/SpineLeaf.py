@@ -132,5 +132,13 @@ class SpineLeaf(Topology):
         dc = dict([(c, len(c.flowIds)) for c in cores])
         return min(dc, key=dc.get)
 
+    def GetCoreLeastQ(self):
+        cores = []
+        for i in range(self.numOfCores):
+            cores.append(self.GetCoreNode(i+1))
+        # print "cores {}".format(cores)
+        dc = dict([(c, len(c.qvalue)) for c in cores])
+        return min(dc, key=dc.get)
+
     def __del__(self):
         pass

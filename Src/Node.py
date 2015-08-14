@@ -15,5 +15,7 @@ class Node:
         # current flows on this node, elements are flow id
         self.flowIds = []
 
+        self.qvalue = 0.0
+
     def __del__(self):
         pass

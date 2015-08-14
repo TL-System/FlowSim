@@ -29,6 +29,10 @@ class Link:
 
         self.queue = 0.0
 
+        self.qvalue = 0.0
+
+        self.congestionThreshold = 10
+
     def SetCap(self, cap):
         self.linkCap = float(cap * Gb)
 
@@ -63,6 +67,10 @@ class Link:
 
         # self.flowRates[flow] = curBw
         return self.flowRates[flow.flowId]
+
+    def IsCongested(self):
+        if len(self.flowIds) > self.congestionThreshold:
+            return True
 
     def __del__(self):
         pass

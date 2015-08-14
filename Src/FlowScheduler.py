@@ -118,6 +118,9 @@ class FlowScheduler:
             node = self.Nodes[nodeId]
             if flag == "remove":
                 node.flowIds.remove(curFlow.flowId)
+                # update q value of spines
+                if len() == 5 and nodeInPath.index(linkId) == 2:
+                    node.qvalue += curFlow.flowSize / (curFlow.finishTime - curFlow.startTime)
             elif flag == "insert":
                 node.flowIds.append(curFlow.flowId)
 
