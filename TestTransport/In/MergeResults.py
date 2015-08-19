@@ -20,7 +20,17 @@ tcp = list(reader)
 # for i in range(len(tcp[0])):
 #     tcp[0][i] = 'tcp_' + tcp[0][i]
 
-result = [a+b+c+d for (a, b, c, d) in zip(mcp, d2tcp, dctcp, tcp)]
+reader = csv.reader(open("d3.csv", "rb"))
+d3 = list(reader)
+# for i in range(len(tcp[0])):
+#     tcp[0][i] = 'tcp_' + tcp[0][i]
+
+reader = csv.reader(open("mock.csv", "rb"))
+mock = list(reader)
+# for i in range(len(tcp[0])):
+#     tcp[0][i] = 'tcp_' + tcp[0][i]
+
+result = [a+b+c+d+e+f for (a, b, c, d, e, f) in zip(mcp, d2tcp, dctcp, tcp, d3, mock)]
 
 writer = csv.writer(open("all.csv", "wb"))
 writer.writerows(result)

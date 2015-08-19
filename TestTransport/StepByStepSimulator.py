@@ -6,7 +6,6 @@ from datetime import datetime
 import csv
 import json
 import copy
-from influxdb import InfluxDBClient
 
 from Src import Flow, Link
 from TUnits import *
@@ -14,7 +13,7 @@ from TUnits import *
 # looking for examples supporting MCP
 # run simulator step by step, running for 100 milliseconds
 # simulating multiple flows over one link
-PROTO = ['tcp', 'mcp', 'd2tcp', 'dctcp']
+PROTO = ['tcp', 'mcp', 'd2tcp', 'dctcp', 'd3', 'mock']
 # PROTO = ['d2tcp']
 
 class StepByStepSimulator:
@@ -63,7 +62,9 @@ class StepByStepSimulator:
             'mcp': [],
             'd2tcp': [],
             'dctcp': [],
-            'tcp': []
+            'tcp': [],
+            'd3': [],
+            'mock': []
         }
 
     def geninput(self):
@@ -146,6 +147,12 @@ class StepByStepSimulator:
             # cWin = max(ExpectedRate * self.RTT + delta, 10 * PKTSIZE / self.RTT)
             flow.bw += delta
             # print 'flow.bw={}'.format(flow.bw)
+        elif flow.transport == 'd3':
+            flow.bw = flow.flowSize / flow.deadline
+        elif flow.transport == 'mock':
+            flow.bw = flow.remainSize / flow.remainTime
+        else:
+            print "Error: Transport protocol not recognized."
         return flow.bw
 
     def run(self):
