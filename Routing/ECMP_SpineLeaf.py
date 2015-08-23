@@ -22,26 +22,26 @@ class ECMP(Routing):
     def BuildAllPath(self):
         self.CalculateAllPath()
 
-    def BuildPath(self, srcId, dstId):
-        self.CalculatePath(srcId, dstId)
+    def BuildPath(self, srcId, dstId, flow):
+        self.CalculatePath(srcId, dstId, flow)
 
     def CalculateAllPath(self):
         """
         This function calculate path between each pair of servers with ECMP
         For spine-leaf, choosing a path is essentially choosing a spine to traverse
         """
-        for srcId in range(1, self.numOfServers + 1):
+        for srcId in range(self.numOfServers):
             #gc.collect()
-            for dstId in range(1, self.numOfServers + 1):
+            for dstId in range(self.numOfServers):
                 self.CalculatePath(srcId=srcId, dstId=dstId)
 
-    def CalculatePath(self, srcId, dstId):
+    def CalculatePath(self, srcId, dstId, flow):
         # only self id is contained, if destination is self
         if srcId == dstId:
             self.pathList[srcId, dstId] = [srcId]
             return
-        srcToRId = self.numOfServers + int(ceil(float(srcId) / self.serverPerRack))
-        dstToRId = self.numOfServers + int(ceil(float(dstId) / self.serverPerRack))
+        srcToRId = self.numOfServers + srcId / self.serverPerRack
+        dstToRId = self.numOfServers + dstId / self.serverPerRack
         # if src and dst are in the same tor switch
         if srcToRId == dstToRId:
             self.pathList[srcId, dstId] = [srcId, srcToRId, dstId]
@@ -49,7 +49,7 @@ class ECMP(Routing):
         # src-dst must traverse core
         else:
             # prick random core
-            rcore = choice(range(self.numOfServers+self.numOfToRs+1, self.numOfServers + self.numOfToRs + self.numOfCores + 1))
+            rcore = choice(range(self.numOfServers + self.numOfToRs, self.numOfServers + self.numOfToRs + self.numOfCores))
             self.pathList[srcId, dstId] = [srcId, srcToRId, rcore, dstToRId, dstId]
 
     def __del__(self):

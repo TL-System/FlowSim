@@ -38,10 +38,10 @@ class Simulator:
         self.sched.AssignLinks(self.topo.GetLinks())
         self.sched.AssignNodes(self.topo.GetNodes())
         self.flows = self.sched.GetAllFlows()
-        for flow in self.flows:
-            self.routing.BuildPath(flow.startId, flow.endId)
-            pathNodeIds = self.routing.GetPath(flow.startId, flow.endId)
-            flow.BuildPath(pathNodeIds)
+       # for flow in self.flows:
+       #     self.routing.BuildPath(flow.startId, flow.endId)
+       #     pathNodeIds = self.routing.GetPath(flow.startId, flow.endId)
+       #     flow.BuildPath(pathNodeIds)
 
     def AssignLoadBalancer(self, LoadBalancer, args):
         self.lb = LoadBalancer()
@@ -70,6 +70,9 @@ class Simulator:
                 else:
                     break
             # insert current start flow to running list
+            self.routing.BuildPath(curStartFlow.startId, curStartFlow.endId, curStartFlow)
+            pathNodeIds = self.routing.GetPath(curStartFlow.startId, curStartFlow.endId)
+            curStartFlow.BuildPath(pathNodeIds)
             self.sched.runningFlows.append(curStartFlow)
             # Update related flow's transfer time in removing a flow
             # self.lb(curStartFlow)
@@ -78,15 +81,15 @@ class Simulator:
 
             # Hedera load balancing for spine leaf
             # print self.topo.GetCoreLeastFlow()
-            if self.topo.name == "spineleaf":
-                if self.topo.GetCoreLeastFlow() not in curStartFlow.pathNodeIds:
-                    if len(curStartFlow.pathNodeIds) == 5:
-                        if curStartFlow.coflowId == 0:
-                            self.changeSpine(curStartFlow, self.topo.GetCoreLeastFlow())
-                            # print "general flow reroute to spine {}".format(self.topo.GetCoreLeastFlow().nodeId)
-                        else:
-                            self.changeSpine(curStartFlow,
-                                             self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1))
+      #      if self.topo.name == "spineleaf":
+      #          if self.topo.GetCoreLeastFlow() not in curStartFlow.pathNodeIds:
+      #              if len(curStartFlow.pathNodeIds) == 5:
+      #                  if curStartFlow.coflowId == 0:
+      #                      self.changeSpine(curStartFlow, self.topo.GetCoreLeastFlow())
+      #                      # print "general flow reroute to spine {}".format(self.topo.GetCoreLeastFlow().nodeId)
+      #                  else:
+      #                      self.changeSpine(curStartFlow,
+      #                                       self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1))
                             # print "coflow reroute to spine {}".format(self.topo.GetCoreNode((curStartFlow.coflowId % self.topo.numOfCores)+1).nodeId)
                         #print curStartFlow.pathNodeIds
                 # Less loaded in terms of more flows
@@ -115,7 +118,7 @@ class Simulator:
         # Finally, all the flows are finished
         self.sched.PrintFlows()
 
-    def changeSpine(self, curStartFlow, spine):
+    def changeSpine(self, curStartFlow, spine):  #aborted
         curStartFlow.pathLinkIds[1] = (curStartFlow.pathLinkIds[1][0], spine.nodeId)
         curStartFlow.pathLinkIds[2] = (spine.nodeId, curStartFlow.pathLinkIds[2][1])
         curStartFlow.pathNodeIds[2] = spine.nodeId

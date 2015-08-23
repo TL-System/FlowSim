@@ -79,5 +79,5 @@ class Flow:
         self.pathNodeIds = pathNodeIds
         # Build path in link ids
         # Append tuple of nodes as links.
-        for i in range(1, len(pathNodeIds)):
-            self.pathLinkIds.append((pathNodeIds[i - 1], pathNodeIds[i]))
+        for i in range(len(pathNodeIds)-1):
+            self.pathLinkIds.append((pathNodeIds[i], pathNodeIds[i+1]))

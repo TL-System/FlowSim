@@ -33,7 +33,7 @@ class TestFlowScheduler(FlowScheduler):
                 else:
                     coflowsize[flow.coflowId] += flow.flowSize
                     coflowwidth[flow.coflowId] += 1
-                flow.flowId = len(self.flows) + 1
+                flow.flowId = len(self.flows)
                 self.flows.append(flow)
 
         FlowScheduler.AssignFlows(self)

@@ -107,11 +107,36 @@ class FlowScheduler:
                 link.flowIds.append(curFlow.flowId)
                 link.flowRates[curFlow.flowId] = 0.00001
                 curTime = curFlow.startTime
+                curFlow.updateTime = curTime
+
+        #each flow get bandwidth on each link in a fair share way
         for linkId in pathInLink:
             link = self.Links[linkId]
             for flowId in link.flowIds:
-                flow = self.flows[flowId - 1]
+                flow = self.flows[flowId]
                 self.UpdateFlowState(curTime, flow)
+
+        # allocate spare bandwidth to the new flow
+        if flag == "insert":
+           min_bw = 1.0 * Gb
+           curFlowId = curFlow.flowId
+           for linkId in pathInLink:
+               link = self.Links[linkId]
+               sparebw = 0
+               for flowId in link.flowIds:
+                   if flowId != curFlowId:
+                      flow = self.flows[flowId]
+                      if flow.bw < link.flowRates[flowId]:
+                         sparebw += link.flowRates[flowId]- flow.bw
+                         link.flowRates[flowId] = flow.bw
+                         # print "spare bandwidth: ",sparebw
+               link.flowRates[curFlowId] += sparebw
+               # if sparebw != 0:
+                #  print "allocated sparebw",sparebw
+               if link.flowRates[curFlowId] < min_bw:
+                   min_bw = link.flowRates[curFlowId]
+           curFlow.bw = min_bw
+           curFlow.finishTime = curTime + curFlow.remainSize / min_bw
 
         nodeInPath = curFlow.pathNodeIds
         for nodeId in nodeInPath:
@@ -119,8 +144,8 @@ class FlowScheduler:
             if flag == "remove":
                 node.flowIds.remove(curFlow.flowId)
                 # update q value of spines
-                if len() == 5 and nodeInPath.index(linkId) == 2:
-                    node.qvalue += curFlow.flowSize / (curFlow.finishTime - curFlow.startTime)
+               # if len() == 5 and nodeInPath.index(linkId) == 2:
+               #     node.qvalue += curFlow.flowSize / (curFlow.finishTime - curFlow.startTime)
             elif flag == "insert":
                 node.flowIds.append(curFlow.flowId)
 

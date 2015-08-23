@@ -77,11 +77,11 @@ class Topology:
 
         for i in range(0, n):
             node = NodeType()
-            node.nodeId = i + 1
+            node.nodeId = i
             for j in range(0, n):
                 if topoMatrix[i][j] == 1:
-                    node.adjNodeIds.append(j + 1)
-                    self.links[i + 1, j + 1] = LinkType((i + 1, j + 1))
+                    node.adjNodeIds.append(j)
+                    self.links[i, j] = LinkType((i, j))
             self.nodes.append(node)
 
         
