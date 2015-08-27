@@ -24,7 +24,8 @@ How to run the code?
 
 1. "cd FlowSim/TestHuawei"
 2. "python Runner.py [-r routing_scheme]"                
-   #the routing_scheme currently can be "ECMP" or "LB" or "Qlearning". E.g., python Runner.py -r Qlearning.
+   # The routing_scheme currently can be "ECMP" or "LB" or "Qlearning". 
+   # E.g., python Runner.py -r Qlearning.
 
 Where to implement Qlearning algorithm?
 
