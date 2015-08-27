@@ -67,6 +67,12 @@ class Link:
 
         # self.flowRates[flow] = curBw
         return self.flowRates[flow.flowId]
+    def GetLinkUtilization(self):
+        
+        usedbw=0.0
+        for fid in self.flowIds:
+            usedbw += self.flowRates[fid]
+        return usedbw / self.linkCap
 
     def IsCongested(self):
         if len(self.flowIds) > self.congestionThreshold:

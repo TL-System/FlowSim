@@ -2,15 +2,16 @@ __author__ = 'lich'
 
 import sys
 
-sys.path.append("..")
+#sys.path.append("..")
 
 import getopt
 
-from Src.Simulator import *
 from TestFlowScheduler import *
 # from Topology.SpineLeaf import *
 from Routing.ECMP_SpineLeaf import *
 from Routing.LB_SpineLeaf import *
+from Routing.Qlearning_SpineLeaf import *
+from Src.Simulator import *
 
 # TODO: add in topology description for spine leaf
 # Flow size is in MB
@@ -23,7 +24,7 @@ avgFlowNum = 1
 alpha = 1.0
 
 
-routing_dict = {'LB':LB,'ECMP':ECMP}
+routing_dict = {'LB':LB, 'ECMP':ECMP, 'Qlearning':Qlearning}
 routing_scheme = LB
 
 opts, args = getopt.getopt(sys.argv[1:], "S:L:a:f:r:", ["S=", "L=", "a=", "f=", "routing="])
