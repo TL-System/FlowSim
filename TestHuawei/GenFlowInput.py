@@ -38,11 +38,11 @@ def SpineLeafFlowInput():
     startTime = 0.0
     randPoisson = PoissonRand(mean=mean, bound=1.0 / mean * 10.0)
     for j in range(avgFlowNum):
-        for i in range(1, flowNums + 1):
+        for i in range(0, flowNums):
             startId = i
-            endId = random.randint(1, flowNums)
+            endId = random.randint(0, flowNums-1)
             if endId == startId:
-                endId = (startId + random.randint(1, flowNums / 2)) % flowNums + 1
+                endId = (startId + random.randint(1, flowNums / 2)) % flowNums
             startTime += randPoisson.GetPoissonNumber()
             print >> f, "%d\t%d\t%d\t%f" % (startId, endId, flowSize, startTime)
 

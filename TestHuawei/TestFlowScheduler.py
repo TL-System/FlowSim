@@ -6,6 +6,7 @@ sys.path.append("..")
 
 from Src.FlowScheduler import *
 from Src.Flow import *
+from random import choice
 
 inDir = "Input/"
 outDir = "Output/"
@@ -17,13 +18,17 @@ class TestFlowScheduler(FlowScheduler):
         f = open(filename, "r")
         coflowsize = {}
         coflowwidth = {}
+        line_count = 0
         for line in f.readlines():
             l = line.rstrip('\r\n').split(',')
-            for i in range(50):
+            line_count += 1
+            if line_count ==500:
+                break
+            for i in range(1):
                 # print l
                 flow = Flow()
-                flow.startId = i + int(l[0])
-                flow.endId = i + int(l[2])
+                flow.startId = choice(range(180)) + int(l[0])
+                flow.endId = choice(range(180)) + int(l[2])
                 flow.SetFlowSize(float(l[6])*100)
                 flow.startTime = float(l[4])
                 flow.coflowId = int(l[5])
@@ -33,7 +38,7 @@ class TestFlowScheduler(FlowScheduler):
                 else:
                     coflowsize[flow.coflowId] += flow.flowSize
                     coflowwidth[flow.coflowId] += 1
-                flow.flowId = len(self.flows) + 1
+                flow.flowId = len(self.flows)
                 self.flows.append(flow)
 
         FlowScheduler.AssignFlows(self)

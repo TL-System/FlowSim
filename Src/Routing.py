@@ -36,9 +36,9 @@ class Routing:
         """
         nodes = self.topo.GetNodes()
         # the first node is None, node id is start from 1
-        for curNode in nodes[1:]:
+        for curNode in nodes[0:]:
             # clean nodes color and parent node id
-            for node in nodes[1:]:
+            for node in nodes[0:]:
                 # 0 means unmarked, 1 means marked
                 node.color = 0
                 # parent node(id) is itself
