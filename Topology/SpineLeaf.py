@@ -10,8 +10,8 @@ from Src.Link import *
 from math import ceil, floor
 
 SERVER = 10
-TOR = 20
-CORE = 10
+TOR = 80
+CORE = 40
 
 
 class SpineLeaf(Topology):

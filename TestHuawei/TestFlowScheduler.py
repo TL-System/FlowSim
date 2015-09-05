@@ -22,7 +22,7 @@ class TestFlowScheduler(FlowScheduler):
         for line in f.readlines():
             l = line.rstrip('\r\n').split(',')
             line_count += 1
-            if line_count ==500:
+            if line_count == 50:
                 break
             for i in range(1):
                 # print l
