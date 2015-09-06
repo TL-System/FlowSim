@@ -205,9 +205,13 @@ class Simulator:
 
             # Finally, all the flows are finished
             self.sched.PrintFlows()
-            if self.Qlearning_enable == 1:
+            if self.Qlearning_enable == 2:
                 self.logf.close()
-                # print "final stateId= ", self.stateId
+            # print "final stateId= ", self.stateId
+            
+            #collect normalized transmission time of all flows
+            for flow in self.flows:
+                self.norm_transmission_time[flow.flowId] = (flow.finishTime-flow.startTime)/flow.flowSize
     
     def printQlearningLog(self):
         print >> self.logf, "%d,%d,%d,%f,%f" % (self.stateId, self.stateId + 1, self.action[2], self.reward[0], self.reward[1])
