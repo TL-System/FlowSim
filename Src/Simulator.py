@@ -35,7 +35,7 @@ class Simulator:
         self.Qlearning_enable = 0
         if str(Routing) == "Routing.Qlearning_SpineLeaf.Qlearning":
             self.Qlearning_enable = 1
-            self.state = [0.0]*len(self.topo.GetLinks())
+            self.state = [0.0]*self.topo.GetLinkNumbetweenSwitch()
             #print len(self.topo.GetLinks())
             self.reward = [0.0, 0.0]
             self.stateId = 0
@@ -70,8 +70,13 @@ class Simulator:
         #update state list by dimension
         dim_id = 0
         for key in self.sched.Links.keys():
-            self.state[dim_id] = self.sched.Links[key].GetLinkUtilization()
-            dim_id += 1
+            if key[0] >= self.numOfServers and key[1] >= self.numOfServers: 
+               self.LinkUtilization[dim_id] = self.sched.Links[key].GetLinkUtilization()
+               self.ActiveFlowNum[dim_id] = self.sched.GetActiveFlowNum()
+               self.ActiveElephantFlowNum[dim_id] = self.sched.GetActiveElephantFlowNum(self.flows)
+               self.state_ActiveFlowRemainSize[dim_id] = self.sched.GetActiveFlowRemainSize(self.flows)
+               dim_id += 1
+        print "dim_id= ", dim_id
         
         # reward of type 1
         #r1 = - 1.0 / (flow.bw/(1024.0*1024.0)*len(flow.pathLinkIds))
@@ -99,7 +104,7 @@ class Simulator:
             self.logf = open(self.logDir + self.logfname, "w")
             counter = 0
             while self.sched.toStartFlows:
-                print counter
+                # print counter
                 counter += 1
                 # the first flow is with earliest startTime
                 curStartFlow = self.sched.toStartFlows[0]
@@ -120,7 +125,11 @@ class Simulator:
                         if self.Qlearning_enable == 1:
                             self.action = toFinishFlow.pathNodeIds
                             if len(self.action) == 5:
-                               self.pre_state = self.state[:]
+                               self.pre_LinkUtilization = self.LinkUtilization[:]
+                               self.pre_ActiveFlowNum = self.ActiveFlowNum[:]
+                               self.pre_ActiveElephantFlowNum = self.ActiveElephantFlowNum[:]
+                               self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
+                               # self.pre_state = self.state[:]
                                self.Update(toFinishFlow)
                                #self.printQlearningLog()
                         #self.routing.update(self.pre_state, self.action, self.state, self.reward)
@@ -163,11 +172,17 @@ class Simulator:
                 if self.Qlearning_enable == 1:
                     self.action = curStartFlow.pathNodeIds
                     if len(self.action) == 5:
-                        self.pre_state = self.state[:]
+                        #self.pre_state = self.state[:]
+                        self.pre_LinkUtilization = self.LinkUtilization[:]
+                        self.pre_ActiveFlowNum = self.ActiveFlowNum[:]
+                        self.pre_ActiveElephantFlowNum = self.ActiveElephantFlowNum[:]
+                        self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
                         self.Update(curStartFlow)
                         self.printQlearningLog()
                         #reward = self.reward[0]
                         reward = self.reward[1]
+                        self.pre_state = self.pre_LinkUtilization
+                        self.state = self.LinkUtilization
                         self.routing.update(self.pre_state, self.action[1], self.action[3], self.action[2], self.state, reward)
                         #self.Update(self.pre_state, self.action, self.state, self.reward)
 
@@ -196,7 +211,11 @@ class Simulator:
                 if self.Qlearning_enable == 1:
                     self.action = curFinishFlow.pathNodeIds
                     if len(self.action) == 5:
-                       self.pre_state = self.state[:]
+                       # self.pre_state = self.state[:]
+                       self.pre_LinkUtilization = self.LinkUtilization[:]
+                       self.pre_ActiveFlowNum = self.ActiveFlowNum[:]
+                       self.pre_ActiveElephantFlowNum = self.ActiveElephantFlowNum[:]
+                       self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
                        self.Update(curFinishFlow)
                        #self.printQlearningLog()
                     #self.routing.update(self.pre_state, self.action, self.state, self.reward)
@@ -205,39 +224,37 @@ class Simulator:
 
             # Finally, all the flows are finished
             self.sched.PrintFlows()
-            if self.Qlearning_enable == 2:
+            if self.Qlearning_enable == 1:
                 self.logf.close()
             # print "final stateId= ", self.stateId
             
             #collect normalized transmission time of all flows
-            for flow in self.flows:
-                self.norm_transmission_time[flow.flowId] = (flow.finishTime-flow.startTime)/flow.flowSize
+            self.average_norm_trans_time = 0.0
+            for flow in self.flows
+                self.norm_trans_time[flow.flowId] = (flow.finishTime-flow.startTime)/flow.flowSize
+                self.average_norm_trans_time += self.norm_trans_time[flow.flowId]
+            self.average_norm_trans_time /= len(self.flows)
     
     def printQlearningLog(self):
         print >> self.logf, "%d,%d,%d,%f,%f" % (self.stateId, self.stateId + 1, self.action[2], self.reward[0], self.reward[1])
       #  flag = 0
-        state_fname = str("state" + str(self.stateId))
-        statef = open(self.logDir + state_fname, "w")
-        for a in self.pre_state:
-            print >> statef, "%f" % (a)
-      #      if a > 0:
-      #          flag = 1
-      #  if flag == 1:
-      #      print "valid  ",self.stateId
-        statef.close()
+        statename_list =["LinkUtilization","ActiveFlowNum","ActiveElephantFlowNum","ActiveFlowRemainSize"]
+        for statename in statename_list:
+            state_fname = str("state_" + str(statename) + "_" + str(self.stateId))
+            statef = open(self.logDir + state_fname, "w")
+            state_toprint= getattr(self, "pre_" + statename)
+            for a in state_toprint:
+                print >> statef, "%f" % (a)
+            statef.close()
         self.stateId += 1
 
-      #  flag =0
-        state_fname = str("state" + str(self.stateId))
-        statef = open(self.logDir + state_fname, "w")
-        for a in self.state:
-            print >> statef, "%f" % (a)
-      #      if a > 0:
-      #          flag = 1
-      #  if flag == 1:
-      #      print "valid  ",self.stateId
-
-        statef.close()
+        for statename in statename_list:
+            state_fname = str("state_" + str(statename) + "_" + str(self.stateId))
+            statef = open(self.logDir + state_fname, "w")
+            state_toprint= getattr(self, statename)
+            for a in state_toprint:
+                print >> statef, "%f" % (a)
+            statef.close()
         self.stateId += 1
 
     def changeSpine(self, curStartFlow, spine):  #aborted
