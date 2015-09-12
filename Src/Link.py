@@ -76,21 +76,23 @@ class Link:
             usedbw += self.flowRates[fid]
         return usedbw / self.linkCap
 
-    def GetActiveFlowNum(self)
+    def GetActiveFlowNum(self):
         return len(self.flowIds)
     
-    def GetActiveElephantFlowNum(self, flows)
+    def GetActiveElephantFlowNum(self, flows):
         elephantflow_count = 0
         for flowid in self.flowIds:
-            if flows[flowid].flowsize >= self.elephantflow_threshold:
+            if flows[flowid].flowSize >= self.elephantflow_threshold:
                 elephantflow_count += 1
 
-       return elephantflow_count
+        return elephantflow_count
 
-    def GetActiveFlowRemainSize(self, flows)
+    def GetActiveFlowRemainSize(self, flows):
         remainsize = 0.0
         for flowid in self.flowIds:
             remainsize += flows[flowid].remainSize
+        
+        return remainsize
 
 
     def IsCongested(self):

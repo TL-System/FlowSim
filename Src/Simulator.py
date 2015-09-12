@@ -35,7 +35,12 @@ class Simulator:
         self.Qlearning_enable = 0
         if str(Routing) == "Routing.Qlearning_SpineLeaf.Qlearning":
             self.Qlearning_enable = 1
-            self.state = [0.0]*self.topo.GetLinkNumbetweenSwitch()
+            print "linkNum between Switches: ", self.topo.GetLinkNumbetweenSwitch()
+            self.LinkUtilization = [0.0]*self.topo.GetLinkNumbetweenSwitch()
+            self.ActiveFlowNum = [0]*self.topo.GetLinkNumbetweenSwitch()
+            self.ActiveElephantFlowNum = [0]*self.topo.GetLinkNumbetweenSwitch()
+            self.ActiveFlowRemainSize = [0.0]*self.topo.GetLinkNumbetweenSwitch()
+            self.state = self.LinkUtilization
             #print len(self.topo.GetLinks())
             self.reward = [0.0, 0.0]
             self.stateId = 0
@@ -70,11 +75,13 @@ class Simulator:
         #update state list by dimension
         dim_id = 0
         for key in self.sched.Links.keys():
-            if key[0] >= self.numOfServers and key[1] >= self.numOfServers: 
+            if key[0] >= self.topo.numOfServers and key[1] >= self.topo.numOfServers:
+             #  print key
+             #  print "dim_id= ", dim_id
                self.LinkUtilization[dim_id] = self.sched.Links[key].GetLinkUtilization()
-               self.ActiveFlowNum[dim_id] = self.sched.GetActiveFlowNum()
-               self.ActiveElephantFlowNum[dim_id] = self.sched.GetActiveElephantFlowNum(self.flows)
-               self.state_ActiveFlowRemainSize[dim_id] = self.sched.GetActiveFlowRemainSize(self.flows)
+               self.ActiveFlowNum[dim_id] = self.sched.Links[key].GetActiveFlowNum()
+               self.ActiveElephantFlowNum[dim_id] = self.sched.Links[key].GetActiveElephantFlowNum(self.flows)
+               self.ActiveFlowRemainSize[dim_id] = self.sched.Links[key].GetActiveFlowRemainSize(self.flows)
                dim_id += 1
         print "dim_id= ", dim_id
         
@@ -183,6 +190,10 @@ class Simulator:
                         reward = self.reward[1]
                         self.pre_state = self.pre_LinkUtilization
                         self.state = self.LinkUtilization
+                        #print self.pre_state
+                        print "len of self.pre_state", len(self.pre_state)
+                        #print self.state
+                        print "len of self.state", len(self.state)
                         self.routing.update(self.pre_state, self.action[1], self.action[3], self.action[2], self.state, reward)
                         #self.Update(self.pre_state, self.action, self.state, self.reward)
 
@@ -230,7 +241,7 @@ class Simulator:
             
             #collect normalized transmission time of all flows
             self.average_norm_trans_time = 0.0
-            for flow in self.flows
+            for flow in self.flows:
                 self.norm_trans_time[flow.flowId] = (flow.finishTime-flow.startTime)/flow.flowSize
                 self.average_norm_trans_time += self.norm_trans_time[flow.flowId]
             self.average_norm_trans_time /= len(self.flows)
@@ -242,8 +253,10 @@ class Simulator:
         for statename in statename_list:
             state_fname = str("state_" + str(statename) + "_" + str(self.stateId))
             statef = open(self.logDir + state_fname, "w")
-            state_toprint= getattr(self, "pre_" + statename)
-            for a in state_toprint:
+            # select the flow attribution to print
+            flowattr_toprint= getattr(self, "pre_" + statename)
+            # print flowattr_toprint
+            for a in flowattr_toprint:
                 print >> statef, "%f" % (a)
             statef.close()
         self.stateId += 1
@@ -251,8 +264,10 @@ class Simulator:
         for statename in statename_list:
             state_fname = str("state_" + str(statename) + "_" + str(self.stateId))
             statef = open(self.logDir + state_fname, "w")
-            state_toprint= getattr(self, statename)
-            for a in state_toprint:
+            flowattr_toprint= getattr(self, statename)
+            #print flowattr_toprint
+            for a in flowattr_toprint:
+               # print "a= ",a
                 print >> statef, "%f" % (a)
             statef.close()
         self.stateId += 1

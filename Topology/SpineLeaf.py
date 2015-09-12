@@ -54,7 +54,7 @@ class SpineLeaf(Topology):
                 self.links[c, t] = Link((c, t))
 
     def GetLinkNumbetweenSwitch(self):
-        return self.numOfCores*self.numOfToRs
+        return self.numOfCores*self.numOfToRs*2
 
     def CreateNodes(self):
         # node id start from 1
