@@ -62,6 +62,7 @@ class Simulator:
         self.sched.AssignLinks(self.topo.GetLinks())
         self.sched.AssignNodes(self.topo.GetNodes())
         self.flows = self.sched.GetAllFlows()
+        self.norm_trans_time = [0.0]*len(self.flows)
        # for flow in self.flows:
        #     self.routing.BuildPath(flow.startId, flow.endId)
        #     pathNodeIds = self.routing.GetPath(flow.startId, flow.endId)
@@ -83,7 +84,7 @@ class Simulator:
                self.ActiveElephantFlowNum[dim_id] = self.sched.Links[key].GetActiveElephantFlowNum(self.flows)
                self.ActiveFlowRemainSize[dim_id] = self.sched.Links[key].GetActiveFlowRemainSize(self.flows)
                dim_id += 1
-        print "dim_id= ", dim_id
+        #print "dim_id= ", dim_id
         
         # reward of type 1
         #r1 = - 1.0 / (flow.bw/(1024.0*1024.0)*len(flow.pathLinkIds))
@@ -104,7 +105,7 @@ class Simulator:
         """
        # print "len of tostartFlows ", len(self.sched.toStartFlows)
         # start all the flows along with updating related flow transfer time
-        max_episodes = 5
+        max_episodes = 1
         for episode in range(max_episodes):
             self.AssignScheduler(FlowScheduler=self.schedType, args="Input/trace.csv")
             self.logfname = "StateLog" + str(episode) + ".csv"
@@ -191,10 +192,10 @@ class Simulator:
                         self.pre_state = self.pre_LinkUtilization
                         self.state = self.LinkUtilization
                         #print self.pre_state
-                        print "len of self.pre_state", len(self.pre_state)
+                        #print "len of self.pre_state", len(self.pre_state)
                         #print self.state
-                        print "len of self.state", len(self.state)
-                        self.routing.update(self.pre_state, self.action[1], self.action[3], self.action[2], self.state, reward)
+                        #print "len of self.state", len(self.state)
+                       # self.routing.update(self.pre_state, self.action[1], self.action[3], self.action[2], self.state, reward)
                         #self.Update(self.pre_state, self.action, self.state, self.reward)
 
                 # Resort runningFlows by endTime
@@ -257,7 +258,11 @@ class Simulator:
             flowattr_toprint= getattr(self, "pre_" + statename)
             # print flowattr_toprint
             for a in flowattr_toprint:
-                print >> statef, "%f" % (a)
+                if statename == "LinkUtilization" or statename == "ActiveFlowRemainSize":
+                    print >> statef, "%f" % (a)
+                elif statename == "ActiveFlowNum" or statename == "ActiveElephantFlowNum":
+                    print >> statef, "%d" %(a)
+
             statef.close()
         self.stateId += 1
 
@@ -268,7 +273,10 @@ class Simulator:
             #print flowattr_toprint
             for a in flowattr_toprint:
                # print "a= ",a
-                print >> statef, "%f" % (a)
+                if statename == "LinkUtilization" or statename == "ActiveFlowRemainSize":
+                    print >> statef, "%f" % (a)
+                elif statename == "ActiveFlowNum" or statename == "ActiveElephantFlowNum":
+                    print >> statef, "%d" %(a)
             statef.close()
         self.stateId += 1
 
