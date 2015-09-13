@@ -48,7 +48,8 @@ def main():
     testTopo.CreateTopology()
     sim.AssignTopology(topo=testTopo, cap=1.0 * Gb)
     sim.AssignRoutingEngine(Routing=routing_scheme)
-    sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args="Input/trace.csv")
+    #sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args="Input/trace.csv")
+    sim.setSchedType(FlowScheduler=TestFlowScheduler)
     sim.Run()
 
 if __name__ == "__main__":

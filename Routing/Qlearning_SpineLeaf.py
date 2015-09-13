@@ -59,8 +59,8 @@ class Qlearning(Routing):
 
     def select_action(self, state, source_id, destination_id):
         # randomly choose a core switch. Delete this after implementing Qlearning algorithm
-        coreId = choice(range(self.topo.numOfServers + self.topo.numOfToRs, self.topo.numOfServers + self.topo.numOfToRs + self.topo.numOfCores))
-        return coreId
+        #coreId = choice(range(self.topo.numOfServers + self.topo.numOfToRs, self.topo.numOfServers + self.topo.numOfToRs + self.topo.numOfCores))
+        #return coreId
         source = source_id - self.topo.numOfServers
         destination = destination_id - self.topo.numOfServers
         action = self.QLearner.select_action(state, source, destination)

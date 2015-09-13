@@ -51,14 +51,16 @@ class Simulator:
 
         # We can get path by
         # path_3_5 = self.routing.GetPath(3,5)             # result is a list with node ids
+    def setSchedType(self, FlowScheduler):
+        self.schedType = FlowScheduler
 
     def AssignScheduler(self, FlowScheduler, args):
         """
         Assign the flow scheduler. It also assign the flows to be scheduled.
         """
-        self.schedType = FlowScheduler
+        #self.schedType = FlowScheduler
         self.sched = FlowScheduler()
-        self.sched.AssignFlows(args)
+        self.sched.AssignFlows(self.topo, args)
         self.sched.AssignLinks(self.topo.GetLinks())
         self.sched.AssignNodes(self.topo.GetNodes())
         self.flows = self.sched.GetAllFlows()
@@ -105,7 +107,7 @@ class Simulator:
         """
        # print "len of tostartFlows ", len(self.sched.toStartFlows)
         # start all the flows along with updating related flow transfer time
-        max_episodes = 1
+        max_episodes = 5
         for episode in range(max_episodes):
             self.AssignScheduler(FlowScheduler=self.schedType, args="Input/trace.csv")
             self.logfname = "StateLog" + str(episode) + ".csv"
@@ -195,7 +197,7 @@ class Simulator:
                         #print "len of self.pre_state", len(self.pre_state)
                         #print self.state
                         #print "len of self.state", len(self.state)
-                       # self.routing.update(self.pre_state, self.action[1], self.action[3], self.action[2], self.state, reward)
+                        self.routing.update(self.pre_state, self.action[1], self.action[3], self.action[2], self.state, reward)
                         #self.Update(self.pre_state, self.action, self.state, self.reward)
 
                 # Resort runningFlows by endTime

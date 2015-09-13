@@ -13,7 +13,7 @@ outDir = "Output/"
 
 
 class TestFlowScheduler(FlowScheduler):
-    def AssignFlows(self, filename="Input/trace.csv"):
+    def AssignFlows(self, topo, filename="Input/trace.csv"):
         #print sum(1 for li in open(filename,'r'))
         f = open(filename, "r")
         coflowsize = {}
@@ -25,10 +25,12 @@ class TestFlowScheduler(FlowScheduler):
             for i in range(50):
                 # print l
                 flow = Flow()
-                flow.startId = choice(range(30)) + int(l[0])
-                flow.endId = choice(range(30)) + int(l[2])
-                flow.SetFlowSize(float(l[6])*1000000000)
-                flow.startTime = float(l[4])/50.0
+                flow.startId = choice(range(topo.numOfServers-20)) + int(l[0])
+                flow.endId = choice(range(topo.numOfServers-20)) + int(l[2])
+                if flow.startId/topo.serverPerRack == flow.endId/topo.serverPerRack:
+                    flow.endId = (flow.endId + topo.serverPerRack)%topo.numOfServers
+                flow.SetFlowSize(float(l[6])*1024*1024)
+                flow.startTime = float(l[4])/1000
                 flow.coflowId = int(l[5])
                 if flow.coflowId not in coflowsize:
                     coflowsize[flow.coflowId] = flow.flowSize
@@ -38,11 +40,11 @@ class TestFlowScheduler(FlowScheduler):
                     coflowwidth[flow.coflowId] += 1
                 flow.flowId = len(self.flows)
                 self.flows.append(flow)
-            if line_count == 50:
+            if line_count == 100:
                 break
 
         FlowScheduler.AssignFlows(self)
-        print "number of input flows = ",len(self.flows)*50
+        print "number of input flows = ",len(self.flows)
         f.close()
 
         f = open("Input/coflow_in.csv","w")
