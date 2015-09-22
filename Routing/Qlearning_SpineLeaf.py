@@ -39,7 +39,7 @@ class Qlearning(Routing):
         #self.numOfToRs = topo.numOfToRs
         #self.numOfCores = topo.numOfCores
         self.topo = topo
-        self.QLearner = LearnSDN(self.topo.numOfCores, self.topo.numOfToRs, self.topo.numOfToRs, 2*self.topo.serverPerRack*self.topo.numOfToRs + 2*self.topo.numOfToRs * self.topo.numOfCores, number_hidden_nodes_per_layer, activation_function_type, exploration_type, epsilon, alpha, gamma, beta, learning_rate, learning_method)
+        self.QLearner = LearnSDN(self.topo.numOfCores, self.topo.numOfToRs, self.topo.numOfToRs, 2*self.topo.numOfToRs * self.topo.numOfCores, number_hidden_nodes_per_layer, activation_function_type, exploration_type, epsilon, alpha, gamma, beta, learning_rate, learning_method)
 
     def BuildAllPath(self):
         self.CalculateAllPath()

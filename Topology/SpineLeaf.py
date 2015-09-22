@@ -9,9 +9,9 @@ from Src.Node import *
 from Src.Link import *
 from math import ceil, floor
 
-SERVER = 10
-TOR = 20
-CORE = 10
+SERVER = 4
+TOR = 8
+CORE = 4
 
 
 class SpineLeaf(Topology):

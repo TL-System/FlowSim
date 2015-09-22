@@ -22,7 +22,7 @@ class TestFlowScheduler(FlowScheduler):
         for line in f.readlines():
             l = line.rstrip('\r\n').split(',')
             line_count += 1
-            for i in range(50):
+            for i in range(1):
                 # print l
                 flow = Flow()
                 flow.startId = choice(range(topo.numOfServers-20)) + int(l[0])
@@ -40,8 +40,8 @@ class TestFlowScheduler(FlowScheduler):
                     coflowwidth[flow.coflowId] += 1
                 flow.flowId = len(self.flows)
                 self.flows.append(flow)
-            if line_count == 100:
-                break
+            #if line_count == 100:
+            #    break
 
         FlowScheduler.AssignFlows(self)
         print "number of input flows = ",len(self.flows)
@@ -62,9 +62,12 @@ class TestFlowScheduler(FlowScheduler):
         f_name = outDir + "coflow.txt"
         f_coflow = open(f_name, "w")
         coflow = {}
-
+        average_flowTransTime = 0.0
+        flowTransTimes = []
         for flow in self.finishedFlows:
             flowTransTime = flow.finishTime - flow.startTime
+            average_flowTransTime += flowTransTime
+            flowTransTimes.append(flowTransTime)
             print >> f, "%d\t%f\t%f\t%f" % (flow.flowId, flowTransTime, flow.startTime, flow.finishTime)
             flow.bw = flow.flowSize / flowTransTime
             # processing coflows output
@@ -78,6 +81,15 @@ class TestFlowScheduler(FlowScheduler):
                     coflowEnd = flow.finishTime
                 coflowCompletion = coflowEnd - coflowStart
                 coflow[flow.coflowId] = (coflowStart, coflowEnd, coflowCompletion)
+      
+        average_flowTransTime = average_flowTransTime/len(self.finishedFlows)
+        print "average flow transmission time = ",average_flowTransTime
+        flowTransTimes.sort()
+        # get the 99.99-th percentile flow transmission time.
+        FTT_index = int(len(flowTransTimes)-1)
+        target_flowTransTime = flowTransTimes[FTT_index]
+        print "the 99.99-th percentile flow transmission time = ", target_flowTransTime
+
 
         for k in coflow:
             print >> f_coflow, "{}\t{}\t{}\t{}".format(k, coflow[k][0], coflow[k][1], coflow[k][2])

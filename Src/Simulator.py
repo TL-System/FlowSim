@@ -54,6 +54,9 @@ class Simulator:
     def setSchedType(self, FlowScheduler):
         self.schedType = FlowScheduler
 
+    def setTraceFName(self, TraceFName):
+        self.TraceFName = TraceFName
+
     def AssignScheduler(self, FlowScheduler, args):
         """
         Assign the flow scheduler. It also assign the flows to be scheduled.
@@ -109,9 +112,11 @@ class Simulator:
         # start all the flows along with updating related flow transfer time
         max_episodes = 5
         for episode in range(max_episodes):
-            self.AssignScheduler(FlowScheduler=self.schedType, args="Input/trace.csv")
-            self.logfname = "StateLog" + str(episode) + ".csv"
-            self.logf = open(self.logDir + self.logfname, "w")
+            #self.AssignScheduler(FlowScheduler=self.schedType, args="Input/trace.csv")
+            self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
+            if self.Qlearning_enable == 1:
+               self.logfname = "StateLog" + str(episode) + ".csv"
+               self.logf = open(self.logDir + self.logfname, "w")
             counter = 0
             while self.sched.toStartFlows:
                 # print counter
@@ -248,6 +253,7 @@ class Simulator:
                 self.norm_trans_time[flow.flowId] = (flow.finishTime-flow.startTime)/flow.flowSize
                 self.average_norm_trans_time += self.norm_trans_time[flow.flowId]
             self.average_norm_trans_time /= len(self.flows)
+            print "average normalized (per bit) transmission time",self.average_norm_trans_time
     
     def printQlearningLog(self):
         print >> self.logf, "%d,%d,%d,%f,%f" % (self.stateId, self.stateId + 1, self.action[2], self.reward[0], self.reward[1])

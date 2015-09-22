@@ -10,6 +10,7 @@ from TestFlowScheduler import *
 # from Topology.SpineLeaf import *
 from Routing.ECMP_SpineLeaf import *
 from Routing.LB_SpineLeaf import *
+from Routing.FlowLB_SpineLeaf import *
 from Routing.Qlearning_SpineLeaf import *
 from Src.Simulator import *
 
@@ -24,10 +25,11 @@ avgFlowNum = 1
 alpha = 1.0
 
 
-routing_dict = {'LB':LB, 'ECMP':ECMP, 'Qlearning':Qlearning}
-routing_scheme = LB
+routing_dict = {'LB':LB, 'ECMP':ECMP, 'Qlearning':Qlearning, 'FlowLB':FlowLB}
+routing_scheme = FlowLB
+trace_FName = "Input/trace.csv"
 
-opts, args = getopt.getopt(sys.argv[1:], "S:L:a:f:r:", ["S=", "L=", "a=", "f=", "routing="])
+opts, args = getopt.getopt(sys.argv[1:], "S:L:a:f:r:i:", ["S=", "L=", "a=", "f=", "routing=", "input="])
 for o, a in opts:
     if o in ("-S", "--S"):
         flowSize = float(a)
@@ -39,6 +41,10 @@ for o, a in opts:
         alpha = float(a)
     elif o in ("-r","--routing"):
         routing_scheme = routing_dict[a]
+    elif o in ("-i","--input"):
+        #print "a = ",a 
+        trace_FName = "Input/" + a
+
 
 
 def main():
@@ -49,6 +55,8 @@ def main():
     sim.AssignTopology(topo=testTopo, cap=1.0 * Gb)
     sim.AssignRoutingEngine(Routing=routing_scheme)
     #sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args="Input/trace.csv")
+    sim.setTraceFName(TraceFName=trace_FName)
+    #print trace_FName
     sim.setSchedType(FlowScheduler=TestFlowScheduler)
     sim.Run()
 
