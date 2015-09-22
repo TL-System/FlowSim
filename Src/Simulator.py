@@ -110,10 +110,24 @@ class Simulator:
         """
        # print "len of tostartFlows ", len(self.sched.toStartFlows)
         # start all the flows along with updating related flow transfer time
+        self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
         max_episodes = 5
         for episode in range(max_episodes):
-            #self.AssignScheduler(FlowScheduler=self.schedType, args="Input/trace.csv")
-            self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
+            print "episode number ", episode+1
+           
+           #self.AssignScheduler(FlowScheduler=self.schedType, args="Input/trace.csv")
+            self.sched.toStartFlows = self.sched.flows[:]
+            self.sched.toStartFlows.sort(key=lambda x: x.startTime)
+            self.sched.runningFlows = []
+            self.finishedFlows = []
+            for flow in self.sched.flows:
+                flow.bw = 0.0
+                flow.pathNodeIds = []
+                flow.pathLinkIds = []
+                flow.updateTime = 0.0
+                flow.finishTime = 0.0
+                flow.remainSize = flow.flowSize
+           
             if self.Qlearning_enable == 1:
                self.logfname = "StateLog" + str(episode) + ".csv"
                self.logf = open(self.logDir + self.logfname, "w")
@@ -124,7 +138,9 @@ class Simulator:
                 # the first flow is with earliest startTime
                 curStartFlow = self.sched.toStartFlows[0]
                 # update flows if there are flows has already finished
+               # print "aaa"
                 while self.sched.runningFlows:
+                 #   print "bbb"
                     # the first flow is with earliest finishTime
                     toFinishFlow = self.sched.runningFlows[0]
                     if toFinishFlow.finishTime <= curStartFlow.startTime:
