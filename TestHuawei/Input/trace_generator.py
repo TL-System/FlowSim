@@ -52,7 +52,7 @@ for fsize in f_sizes:
         f_info[0] = str(f_info[0])
         f_info[2] = str(f_info[2])
     #compute arrival time of current flow, arrival_time_delta is the arrival interval of the current flow
-        arrival_time_delta = choice(range(10,40))/1000000.0
+        arrival_time_delta = choice(range(1,5))/10000000.0
         current_time += arrival_time_delta
         f_info[4] = current_time
         f_info[4] = str(f_info[4])
