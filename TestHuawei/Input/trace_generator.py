@@ -52,9 +52,9 @@ for fsize in f_sizes:
         f_info[0] = str(f_info[0])
         f_info[2] = str(f_info[2])
     #compute arrival time of current flow, arrival_time_delta is the arrival interval of the current flow
-        arrival_time_delta = choice(range(10,40))
+        arrival_time_delta = choice(range(10,40))/1000000.0
         current_time += arrival_time_delta
-        f_info[4] = current_time/1000000
+        f_info[4] = current_time
         f_info[4] = str(f_info[4])
         #compute coflow ID, now on average let one coflow have 100 flows
         f_info[5] = choice(range(flow_num/100))
