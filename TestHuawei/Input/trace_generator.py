@@ -51,17 +51,17 @@ for fsize in f_sizes:
             f_info[0] = (f_info[0]+SERVER)%(SERVER*TOR)
         f_info[0] = str(f_info[0])
         f_info[2] = str(f_info[2])
-        #compute arrival time of current flow
-        #arrival_time_delta = choice(range(10,1000))
-        #current_time += arrival_time_delta
+    #compute arrival time of current flow, arrival_time_delta is the arrival interval of the current flow
+        arrival_time_delta = choice(range(10,40))
+        current_time += arrival_time_delta
         f_info[4] = current_time/1000000
         f_info[4] = str(f_info[4])
-        #compute coflow ID
+        #compute coflow ID, now on average let one coflow have 100 flows
         f_info[5] = choice(range(flow_num/100))
         f_info[5] = str(f_info[5])
         #compute flow size. Note that here we add some variation to the flow size
-        #fsize_delta_factor = choice(range(100))/100.0
-        fsize_delta_factor = 0.0
+        fsize_delta_factor = choice(range(100))/100.0
+        #fsize_delta_factor = 0.0
         f_info[6] = fsize*8*1024*(1.0+fsize_delta_factor)
         f_info[6] = str(f_info[6])
         # print flow infomation
