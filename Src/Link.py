@@ -69,11 +69,11 @@ class Link:
 
         # self.flowRates[flow] = curBw
         return self.flowRates[flow.flowId]
-    def GetLinkUtilization(self):
+    def GetLinkUtilization(self, flows):
         
         usedbw=0.0
         for fid in self.flowIds:
-            usedbw += self.flowRates[fid]
+            usedbw += flows[fid].bw
         return usedbw / self.linkCap
 
     def GetActiveFlowNum(self):

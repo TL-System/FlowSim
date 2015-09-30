@@ -22,7 +22,7 @@ class ECMP(Routing):
     def BuildAllPath(self):
         self.CalculateAllPath()
 
-    def BuildPath(self, srcId, dstId, flow):
+    def BuildPath(self, srcId, dstId, flow, flows):
         self.CalculatePath(srcId, dstId, flow)
 
     def CalculateAllPath(self):

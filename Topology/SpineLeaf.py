@@ -10,7 +10,7 @@ from Src.Link import *
 from math import ceil, floor
 
 SERVER = 4
-TOR = 8
+TOR = 6
 CORE = 4
 
 

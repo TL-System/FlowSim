@@ -23,8 +23,8 @@ class FlowLB(Routing):
     def BuildAllPath(self):
         self.CalculateAllPath()
 
-    def BuildPath(self, srcId, dstId, flow):
-        self.CalculatePath(srcId, dstId, flow)
+    def BuildPath(self, srcId, dstId, flow, flows):
+        self.CalculatePath(srcId, dstId, flow, flows)
 
   #  def CalculateAllPath(self):
   #      """
@@ -35,12 +35,20 @@ class FlowLB(Routing):
   #          for dstId in range(1, self.numOfServers + 1):
   #              self.CalculatePath(srcId=srcId, dstId=dstId)
 
-    def GetCoreLeastFlow(self):                            
+    def GetCoreLeastFlow(self, flows):                            
         cores = []                                         
         for i in range(self.topo.numOfCores):                   
             cores.append(self.topo.GetCoreNode(i))            
-        # print "cores {}".format(cores)                   
-        dc = dict([(c, len(c.flowIds)) for c in cores])    
+        # print "cores {}".format(cores)     
+        dc ={}
+        for c in cores:
+            fsize = 0.0
+            for flowId in c.flowIds:
+                fsize += flows[flowId].remainSize
+            dc[c] = fsize
+        #for key in dc.keys():
+            #print "key= ",key.nodeId," dc[key]= ",dc[key],"    "
+        #print "min of dc ",min(dc, key=dc.get).nodeId
         return min(dc, key=dc.get)                         
     
     def GetCoreLeastQ(self):                               
@@ -51,7 +59,7 @@ class FlowLB(Routing):
         dc = dict([(c, len(c.qvalue)) for c in cores])     
         return min(dc, key=dc.get)                         
 
-    def CalculatePath(self, srcId, dstId, flow):
+    def CalculatePath(self, srcId, dstId, flow, flows):
         # only self id is contained, if destination is self
         if srcId == dstId:
             self.pathList[srcId, dstId] = [srcId]
@@ -67,7 +75,7 @@ class FlowLB(Routing):
             # prick random core
            # rcore = choice(range(self.numOfServers+self.numOfToRs+1, self.numOfServers + self.numOfToRs + self.numOfCores + 1))
            # if flow.coflowId == 0: 
-            rcore=self.GetCoreLeastFlow()
+            rcore=self.GetCoreLeastFlow(flows)
            #  else:
            #     rcore=self.topo.GetCoreNode(flow.coflowId % self.topo.numOfCores)
             rcoreId=rcore.nodeId

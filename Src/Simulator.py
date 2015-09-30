@@ -84,7 +84,7 @@ class Simulator:
             if key[0] >= self.topo.numOfServers and key[1] >= self.topo.numOfServers:
              #  print key
              #  print "dim_id= ", dim_id
-               self.LinkUtilization[dim_id] = self.sched.Links[key].GetLinkUtilization()
+               self.LinkUtilization[dim_id] = self.sched.Links[key].GetLinkUtilization(self.flows)
                self.ActiveFlowNum[dim_id] = self.sched.Links[key].GetActiveFlowNum()
                self.ActiveElephantFlowNum[dim_id] = self.sched.Links[key].GetActiveElephantFlowNum(self.flows)
                self.ActiveFlowRemainSize[dim_id] = self.sched.Links[key].GetActiveFlowRemainSize(self.flows)
@@ -98,8 +98,8 @@ class Simulator:
         r2 = 0.0
         for linkId in flow.pathLinkIds:
             link = self.sched.Links[linkId]
-            if link.GetLinkUtilization() > r2:
-                r2 = link.GetLinkUtilization()
+            if link.GetLinkUtilization(self.flows) > r2:
+                r2 = link.GetLinkUtilization(self.flows)
             #print link.GetLinkUtilization()
         r2 = -r2
         self.reward = [r1, r2]
@@ -111,7 +111,7 @@ class Simulator:
        # print "len of tostartFlows ", len(self.sched.toStartFlows)
         # start all the flows along with updating related flow transfer time
         self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
-        max_episodes = 5
+        max_episodes = 1
         for episode in range(max_episodes):
             print "episode number ", episode+1
            
@@ -172,7 +172,7 @@ class Simulator:
                 if self.Qlearning_enable == 1:
                     self.routing.BuildPath(curStartFlow.startId, curStartFlow.endId, curStartFlow, self.state)
                 else:
-                    self.routing.BuildPath(curStartFlow.startId, curStartFlow.endId, curStartFlow)
+                    self.routing.BuildPath(curStartFlow.startId, curStartFlow.endId, curStartFlow, self.flows)
                 pathNodeIds = self.routing.GetPath(curStartFlow.startId, curStartFlow.endId)
                 curStartFlow.BuildPath(pathNodeIds)
                 self.sched.runningFlows.append(curStartFlow)
@@ -236,6 +236,8 @@ class Simulator:
                 # remove it from running list
                 self.sched.runningFlows.remove(curFinishFlow)
                 # insert it to finished flows
+                #print "start time",curFinishFlow.startTime,"  finish time",curFinishFlow.finishTime
+                #print "flow bw",curFinishFlow.bw
                 self.sched.finishedFlows.append(curFinishFlow)
                 # Update related flow's transfer time in removing a flow
                 self.sched.UpdateFlow(curFinishFlow, "remove")

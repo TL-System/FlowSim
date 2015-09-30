@@ -25,12 +25,15 @@ class TestFlowScheduler(FlowScheduler):
             for i in range(1):
                 # print l
                 flow = Flow()
-                flow.startId = choice(range(topo.numOfServers-20)) + int(l[0])
-                flow.endId = choice(range(topo.numOfServers-20)) + int(l[2])
-                if flow.startId/topo.serverPerRack == flow.endId/topo.serverPerRack:
-                    flow.endId = (flow.endId + topo.serverPerRack)%topo.numOfServers
-                flow.SetFlowSize(float(l[6])*1024*1024)
-                flow.startTime = float(l[4])/1000
+                flow.startId = int(l[0])
+                flow.endId = int(l[2])
+                #flow.startId = choice(range(topo.numOfServers-20)) + int(l[0])
+                #flow.endId = choice(range(topo.numOfServers-20)) + int(l[2])
+                #if flow.startId/topo.serverPerRack == flow.endId/topo.serverPerRack:
+                #    flow.endId = (flow.endId + topo.serverPerRack)%topo.numOfServers
+                #flow.SetFlowSize(float(l[6])*1024*1024)
+                flow.SetFlowSize(float(l[6]))
+                flow.startTime = float(l[4])
                 flow.coflowId = int(l[5])
                 if flow.coflowId not in coflowsize:
                     coflowsize[flow.coflowId] = flow.flowSize
@@ -87,6 +90,7 @@ class TestFlowScheduler(FlowScheduler):
         flowTransTimes.sort()
         # get the 99.99-th percentile flow transmission time.
         FTT_index = int(len(flowTransTimes)-1)
+        flowTransTimes.sort()
         target_flowTransTime = flowTransTimes[FTT_index]
         print "the 99.99-th percentile flow transmission time = ", target_flowTransTime
 
