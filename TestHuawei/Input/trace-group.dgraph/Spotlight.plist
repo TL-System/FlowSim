@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Labels</key>
+	<string>Coflow traffic pattern
+Source IP last Octet
+Destination IP last Octet
+Coflow#415
+Coflow#206
+Coflow#8
+
+Coflow traffic pattern (All)
+Source IP last Octet
+Destination IP last Octet
+</string>
+	<key>Text</key>
+	<string></string>
+</dict>
+</plist>

@@ -1,0 +1,11 @@
+dctcp_flow_id,dctcp_deadline,dctcp_flowSize,dctcp_startTime,dctcp_finishTime,dctcp_fct
+6,2,5,3,5,2
+7,2,5,3,4,1
+8,1,5,4,7,3
+0,5,5,0,2,2
+1,5,5,0,3,3
+3,4,5,1,3,2
+2,4,5,1,4,3
+5,3,5,2,4,2
+9,1,2,4,4,0
+4,3,5,2,6,4

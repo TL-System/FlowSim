@@ -1,0 +1,11 @@
+mock_flow_id,mock_deadline,mock_flowSize,mock_startTime,mock_finishTime,mock_fct
+0,5,5,0,4,4
+1,5,5,0,5,5
+2,4,5,1,4,3
+3,4,5,1,6,5
+4,3,5,2,4,2
+5,3,5,2,5,3
+6,2,5,3,4,1
+7,2,5,3,7,4
+8,1,5,4,4,0
+9,1,2,4,5,1

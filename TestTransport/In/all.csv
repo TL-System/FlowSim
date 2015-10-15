@@ -1,0 +1,11 @@
+flow-id,mcp-deadline,mcp-flowSize,mcp-startTime,mcp-finishTime,mcp-fct,d2tcp-deadline,d2tcp-flowSize,d2tcp-startTime,d2tcp-finishTime,d2tcp-fct,dctcp-deadline,dctcp-flowSize,dctcp-startTime,dctcp-finishTime,dctcp-fct,tcp-deadline,tcp-flowSize,tcp-startTime,tcp-finishTime,tcp-fct,d3-deadline,d3-flowSize,d3-startTime,d3-finishTime,d3-fct,mock-deadline,mock-flowSize,mock-startTime,mock-finishTime,mock-fct
+0,5,5,0,1,1,5,5,0,2,2,5,5,0,2,2,5,5,0,2,2,5,5,0,4,4,5,5,0,4,4
+1,5,5,0,2,2,5,5,0,3,3,5,5,0,3,3,5,5,0,3,3,5,5,0,5,5,5,5,0,5,5
+2,4,5,1,3,2,4,5,1,4,3,4,5,1,4,3,4,5,1,4,3,4,5,1,4,3,4,5,1,4,3
+3,4,5,1,2,1,4,5,1,3,2,4,5,1,3,2,4,5,1,3,2,4,5,1,6,5,4,5,1,6,5
+4,3,5,2,5,3,3,5,2,6,4,3,5,2,6,4,3,5,2,6,4,3,5,2,4,2,3,5,2,4,2
+5,3,5,2,3,1,3,5,2,4,2,3,5,2,4,2,3,5,2,4,2,3,5,2,5,3,3,5,2,5,3
+6,2,5,3,6,3,2,5,3,5,2,2,5,3,5,2,2,5,3,5,2,2,5,3,4,1,2,5,3,4,1
+7,2,5,3,4,1,2,5,3,4,1,2,5,3,4,1,2,5,3,4,1,2,5,3,7,4,2,5,3,7,4
+8,1,5,4,5,1,1,5,4,7,3,1,5,4,7,3,1,5,4,7,3,1,5,4,4,0,1,5,4,4,0
+9,1,2,4,4,0,1,2,4,4,0,1,2,4,4,0,1,2,4,4,0,1,2,4,5,1,1,2,4,5,1

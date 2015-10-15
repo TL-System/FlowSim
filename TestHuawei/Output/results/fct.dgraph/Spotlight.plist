@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Labels</key>
+	<string>Flow completion time
+ms
+CDF
+mind
+hedera
+ecmp
+
+Average flow completion time
+ms
+
+99th percentile flow completion time
+ms
+
+Short flow (&lt;1MB) completion time
+ms
+
+Long flow (&gt;10MB) completion time
+ms
+</string>
+	<key>Text</key>
+	<string></string>
+</dict>
+</plist>
