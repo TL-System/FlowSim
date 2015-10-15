@@ -9,9 +9,9 @@ from Src.Node import *
 from Src.Link import *
 from math import ceil, floor
 
-SERVER = 10
-TOR = 20
-CORE = 10
+SERVER = 4
+TOR = 6
+CORE = 4
 
 
 class SpineLeaf(Topology):
@@ -52,6 +52,9 @@ class SpineLeaf(Topology):
                            self.numOfServers + self.numOfToRs + self.numOfCores):
                 self.links[t, c] = Link((t, c))
                 self.links[c, t] = Link((c, t))
+
+    def GetLinkNumbetweenSwitch(self):
+        return self.numOfCores*self.numOfToRs*2
 
     def CreateNodes(self):
         # node id start from 1

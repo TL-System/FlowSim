@@ -13,8 +13,8 @@ outDir = "Output/"
 
 
 class TestFlowScheduler(FlowScheduler):
-    def AssignFlows(self, filename="Input/trace.csv"):
-        print sum(1 for li in open(filename,'r'))
+    def AssignFlows(self, topo, filename="Input/trace.csv"):
+        #print sum(1 for li in open(filename,'r'))
         f = open(filename, "r")
         coflowsize = {}
         coflowwidth = {}
@@ -22,14 +22,17 @@ class TestFlowScheduler(FlowScheduler):
         for line in f.readlines():
             l = line.rstrip('\r\n').split(',')
             line_count += 1
-            if line_count ==500:
-                break
             for i in range(1):
                 # print l
                 flow = Flow()
-                flow.startId = choice(range(180)) + int(l[0])
-                flow.endId = choice(range(180)) + int(l[2])
-                flow.SetFlowSize(float(l[6])*100)
+                flow.startId = int(l[0])
+                flow.endId = int(l[2])
+                #flow.startId = choice(range(topo.numOfServers-20)) + int(l[0])
+                #flow.endId = choice(range(topo.numOfServers-20)) + int(l[2])
+                #if flow.startId/topo.serverPerRack == flow.endId/topo.serverPerRack:
+                #    flow.endId = (flow.endId + topo.serverPerRack)%topo.numOfServers
+                #flow.SetFlowSize(float(l[6])*1024*1024)
+                flow.SetFlowSize(float(l[6]))
                 flow.startTime = float(l[4])
                 flow.coflowId = int(l[5])
                 if flow.coflowId not in coflowsize:
@@ -40,9 +43,11 @@ class TestFlowScheduler(FlowScheduler):
                     coflowwidth[flow.coflowId] += 1
                 flow.flowId = len(self.flows)
                 self.flows.append(flow)
+            #if line_count == 100:
+            #    break
 
         FlowScheduler.AssignFlows(self)
-        print len(self.flows)
+        print "number of input flows = ",len(self.flows)
         f.close()
 
         f = open("Input/coflow_in.csv","w")
@@ -60,9 +65,12 @@ class TestFlowScheduler(FlowScheduler):
         f_name = outDir + "coflow.txt"
         f_coflow = open(f_name, "w")
         coflow = {}
-
+        average_flowTransTime = 0.0
+        flowTransTimes = []
         for flow in self.finishedFlows:
             flowTransTime = flow.finishTime - flow.startTime
+            average_flowTransTime += flowTransTime
+            flowTransTimes.append(flowTransTime)
             print >> f, "%d\t%f\t%f\t%f" % (flow.flowId, flowTransTime, flow.startTime, flow.finishTime)
             flow.bw = flow.flowSize / flowTransTime
             # processing coflows output
@@ -76,6 +84,16 @@ class TestFlowScheduler(FlowScheduler):
                     coflowEnd = flow.finishTime
                 coflowCompletion = coflowEnd - coflowStart
                 coflow[flow.coflowId] = (coflowStart, coflowEnd, coflowCompletion)
+      
+        average_flowTransTime = average_flowTransTime/len(self.finishedFlows)
+        print "average flow transmission time = ",average_flowTransTime
+        flowTransTimes.sort()
+        # get the 99.99-th percentile flow transmission time.
+        FTT_index = int(len(flowTransTimes)-1)
+        flowTransTimes.sort()
+        target_flowTransTime = flowTransTimes[FTT_index]
+        print "the 99.99-th percentile flow transmission time = ", target_flowTransTime
+
 
         for k in coflow:
             print >> f_coflow, "{}\t{}\t{}\t{}".format(k, coflow[k][0], coflow[k][1], coflow[k][2])

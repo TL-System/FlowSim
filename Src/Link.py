@@ -7,13 +7,15 @@ from Unit import *
 
 class Link:
 
-    def __init__(self, id):
+    def __init__(self, id, elephantflow_threshold=1.0 * Mb):
         # link ID is named as tuple of (start node id, destination node id)
         """
 
         :rtype : int
         """
         self.linkId = id
+         
+        self.elephantflow_threshold = elephantflow_threshold
 
         # link capacity
         self.linkCap = 1.0 * Gb
@@ -67,12 +69,31 @@ class Link:
 
         # self.flowRates[flow] = curBw
         return self.flowRates[flow.flowId]
-    def GetLinkUtilization(self):
+    def GetLinkUtilization(self, flows):
         
         usedbw=0.0
         for fid in self.flowIds:
-            usedbw += self.flowRates[fid]
+            usedbw += flows[fid].bw
         return usedbw / self.linkCap
+
+    def GetActiveFlowNum(self):
+        return len(self.flowIds)
+    
+    def GetActiveElephantFlowNum(self, flows):
+        elephantflow_count = 0
+        for flowid in self.flowIds:
+            if flows[flowid].flowSize >= self.elephantflow_threshold:
+                elephantflow_count += 1
+
+        return elephantflow_count
+
+    def GetActiveFlowRemainSize(self, flows):
+        remainsize = 0.0
+        for flowid in self.flowIds:
+            remainsize += flows[flowid].remainSize
+        
+        return remainsize
+
 
     def IsCongested(self):
         if len(self.flowIds) > self.congestionThreshold:
