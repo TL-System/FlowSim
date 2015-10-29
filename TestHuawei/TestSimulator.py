@@ -5,14 +5,13 @@ import time
 
 from TestFlowScheduler import *
 
-# from Topology.SpineLeaf import *
+from Topology.SpineLeaf import *
 from Routing.ECMP_SpineLeaf import *
 from Routing.LB_SpineLeaf import *
 from Routing.FlowLB_SpineLeaf import *
 from Routing.Qlearning_SpineLeaf import *
 from Src.Simulator import *
 
-# TODO: add in topology description for spine leaf
 # Flow size is in MB
 flowSize = 100.0
 # The mean of poisson arrival rate
@@ -76,20 +75,20 @@ for o, a in opts:
 
 
 def main():
-    # print routing_scheme
+    print routing_scheme
     sim = Simulator()
     testTopo = SpineLeaf(server, tor, core)
     testTopo.CreateTopology()
     sim.AssignTopology(topo=testTopo, cap=1.0 * Gb)
     sim.AssignRoutingEngine(max_episodes, reward_type, features, number_hidden_nodes_per_layer, exploration_type,
-                            epsilon, setting, Routing=routing_scheme)
-    # sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args="Input/trace.csv")
+                            eps, setting, Routing=routing_scheme)
+    sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args="Input/trace.csv")
     sim.setTraceFName(TraceFName=trace_FName)
-    # print trace_FName
+    print trace_FName
     sim.setSchedType(FlowScheduler=TestFlowScheduler)
     start_time = time.time()
     sim.Run()
-    # print time.time() - start_time
+    print time.time() - start_time
 
 
 if __name__ == "__main__":
