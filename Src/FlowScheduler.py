@@ -31,7 +31,7 @@ class FlowScheduler:
         """
         self.Nodes = nodes
 
-    def AssignFlows(self):
+    def AssignFlows(self, topo=None, filename=None):
         """
         Assign flows including flow id, flow size, flow start id and end id, flow start time.
         It can read flow info from a configuration file or assigned by some parameters.

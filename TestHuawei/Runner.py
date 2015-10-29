@@ -1,6 +1,6 @@
 import os
 import sys
-
+# No use. Consider removing it.
 
 def main(args):
     #    routing_scheme = ""

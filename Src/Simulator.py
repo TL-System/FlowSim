@@ -1,6 +1,6 @@
 from Unit import *
 from TestHuawei.Input.make_trace import *
-
+import time
 
 # from Src.Flow import *
 # import sys
@@ -33,11 +33,12 @@ class Simulator:
         Assign the routing method in a centralized way.
         Routing is a function that takes topo as input
         """
+        self.stateId = 0
         self.number_state_vectors = len(features)
         self.reward_type = reward_type
         self.features = features
         self.setting = setting
-        self.max_episodes = max_episodes
+        self.max_episodes = max([1, max_episodes])
         if str(Routing) == "Routing.Qlearning_SpineLeaf.Qlearning":
             self.routing = Routing(self.number_state_vectors, number_hidden_nodes_per_layer, exploration_type, epsilon,
                                    self.topo)
@@ -45,6 +46,7 @@ class Simulator:
             self.routing = Routing(self.topo)
         self.Qlearning_enable = 0
         self.logDir = "LogInfo/"
+        print "Start changing Qlearning_enable"
         if str(Routing) == "Routing.Qlearning_SpineLeaf.Qlearning":
             self.Qlearning_enable = 1
             print "linkNum between Switches: ", self.topo.GetLinkNumbetweenSwitch()
@@ -67,6 +69,7 @@ class Simulator:
             self.LinkUtilization = [0.0] * self.topo.GetLinkNumbetweenSwitch()
             # We can get path by
             # path_3_5 = self.routing.GetPath(3,5)             # result is a list with node ids
+        print "Qlearning_enable={}".format(self.Qlearning_enable)
 
     def setSchedType(self, FlowScheduler):
         self.schedType = FlowScheduler
@@ -133,25 +136,23 @@ class Simulator:
         self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
         if self.Qlearning_enable == 1:
             self.logfname = "Reward_QLearning" + self.setting + ".csv"
-            self.logf = open(self.logDir + self.logfname, "w")
             self.logfname2 = "FCT_QLearning" + self.setting + ".csv"
-            self.logf2 = open(self.logDir + self.logfname2, "w")
         elif self.Qlearning_enable == 2:
             self.logfname = "Reward_ECMP" + self.setting + ".csv"
-            self.logf = open(self.logDir + self.logfname, "w")
             self.logfname2 = "FCT_ECMP" + self.setting + ".csv"
-            self.logf2 = open(self.logDir + self.logfname2, "w")
         elif self.Qlearning_enable == 3:
             self.logfname = "Reward_FlowLB" + self.setting + ".csv"
-            self.logf = open(self.logDir + self.logfname, "w")
             self.logfname2 = "FCT_FlowLB" + self.setting + ".csv"
-            self.logf2 = open(self.logDir + self.logfname2, "w")
         else:
             # Most likely for LB
             self.logfname = "Reward_LB" + self.setting + ".csv"
-            self.logf = open(self.logDir + self.logfname, "w")
+            # self.logf = open(self.logDir + self.logfname, "w").close()
             self.logfname2 = "FCT_LB" + self.setting + ".csv"
-            self.logf2 = open(self.logDir + self.logfname2, "w")
+            # self.logf2 = open(self.logDir + self.logfname2, "w").close()
+        print "erase the previous content for {} and {}".format(self.logfname, self.logfname2)
+        open("{0}{1}".format(self.logDir, self.logfname), "w").close()
+        open("{0}{1}".format(self.logDir, self.logfname2), "w").close()
+
         for episode in range(self.max_episodes):
             # print "episode number ", episode+1
             # generate_trace()
@@ -205,11 +206,21 @@ class Simulator:
 
                     else:
                         break
+
+                # TODO: Very poor object oriented programming here!!!
                 # insert current start flow to running list
                 if self.Qlearning_enable == 1:
                     self.routing.BuildPath(curStartFlow.startId, curStartFlow.endId, curStartFlow, self.state)
-                else:
+                elif self.Qlearning_enable == 0:
+                    # LB
+                    self.routing.BuildPath(curStartFlow.startId, curStartFlow.endId, curStartFlow)
+                elif self.Qlearning_enable == 2:
+                    # reward ecmp
                     self.routing.BuildPath(curStartFlow.startId, curStartFlow.endId, curStartFlow, self.flows)
+                elif self.Qlearning_enable == 3:
+                    # flowLB
+                    self.routing.BuildPath(curStartFlow.startId, curStartFlow.endId, curStartFlow, self.flows)
+
                 pathNodeIds = self.routing.GetPath(curStartFlow.startId, curStartFlow.endId)
                 curStartFlow.BuildPath(pathNodeIds)
                 self.sched.runningFlows.append(curStartFlow)
@@ -235,6 +246,7 @@ class Simulator:
                         self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
                         self.Update(curStartFlow)
                         # self.printQlearningLog()
+                        reward = 0
                         if self.reward_type == 0:
                             reward = self.reward[0]
                         elif self.reward_type == 1:
@@ -293,7 +305,7 @@ class Simulator:
                 # remove this flow from start list
                 self.sched.toStartFlows.remove(curStartFlow)
 
-            # Now, all the flows are started
+            # print "Now, all the flows are started"
             # Iteratively update flow's transfer time in running list until all the flows are finished
             while self.sched.runningFlows:
                 # the first flow is always with earliest finish Time
@@ -318,8 +330,9 @@ class Simulator:
                         self.Update(curFinishFlow)
                         # self.printQlearningLog()
 
-            # Finally, all the flows are finished
+            # print "Finally, all the flows are finished"
             self.sched.PrintFlows()
+            # self.printQlearningLog()
             # if self.Qlearning_enable == 1:
             #    self.logf.close()
             # print "final stateId= ", self.stateId
@@ -331,26 +344,33 @@ class Simulator:
                 self.average_norm_trans_time += self.norm_trans_time[flow.flowId]
             self.average_norm_trans_time /= len(self.flows)
             # print "average normalized (per bit) transmission time",self.average_norm_trans_time
+
+            print "printing to {} and {}.".format(self.logfname, self.logfname2)
+            logf = open("{0}{1}".format(self.logDir, self.logfname), "a")
+            logf2 = open("{0}{1}".format(self.logDir, self.logfname2), "a")
             if self.Qlearning_enable == 1:
-                print >> self.logf, "%f" % (total_reward / counter)
-                print >> self.logf2, "%e" % self.average_norm_trans_time
-                print total_reward
+                print >> logf, "%f" % (total_reward / counter)
+                print >> logf2, "%e" % self.average_norm_trans_time
+                print "Qlearning={},total_reward={}".format(self.Qlearning_enable, total_reward)
                 print total_reward / counter, self.average_norm_trans_time
             elif self.Qlearning_enable == 2 or self.Qlearning_enable == 3:
-                print >> self.logf, "%f" % (total_reward2 / counter)
-                print >> self.logf2, "%e" % self.average_norm_trans_time
+                print >> logf, "%f" % (total_reward2 / counter)
+                print >> logf2, "%e" % self.average_norm_trans_time
                 print total_reward2 / counter, self.average_norm_trans_time
-        self.logf.close()
-        self.logf2.close()
+            logf.close()
+            logf2.close()
 
     def printQlearningLog(self):
-        print >> self.logf, "%d,%d,%d,%f,%f" % (
+        logf = open("{0}{1}".format(self.logDir, self.logfname), "a")
+        # TODO: Everything it needs is not available. Variable Scope is not set properly.
+        print >> logf, "%d,%d,%d,%f,%f" % (
         self.stateId, self.stateId + 1, self.action[2], self.reward[0], self.reward[1])
+        logf.close()
         #  flag = 0
         statename_list = ["LinkUtilization", "ActiveFlowNum", "ActiveElephantFlowNum", "ActiveFlowRemainSize"]
         for statename in statename_list:
             state_fname = str("state_" + str(statename) + "_" + str(self.stateId))
-            statef = open(self.logDir + state_fname, "w")
+            statef = open(self.logDir + state_fname, "a")
             # select the flow attribution to print
             flowattr_toprint = getattr(self, "pre_" + statename)
             # print flowattr_toprint
@@ -359,13 +379,12 @@ class Simulator:
                     print >> statef, "%f" % (a)
                 elif statename == "ActiveFlowNum" or statename == "ActiveElephantFlowNum":
                     print >> statef, "%d" % (a)
-
             statef.close()
         self.stateId += 1
 
         for statename in statename_list:
             state_fname = str("state_" + str(statename) + "_" + str(self.stateId))
-            statef = open(self.logDir + state_fname, "w")
+            statef = open(self.logDir + state_fname, "a")
             flowattr_toprint = getattr(self, statename)
             # print flowattr_toprint
             for a in flowattr_toprint:

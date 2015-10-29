@@ -24,9 +24,9 @@ alpha = 1.0
 routing_dict = {'LB': LB, 'ECMP': ECMP, 'Qlearning': Qlearning, 'FlowLB': FlowLB}
 routing_scheme = LB
 trace_FName = "Input/trace.csv"
-server = 10
-core = 10
-tor = 10
+server = 4
+core = 8
+tor = 8
 number_hidden_nodes_per_layer = [100, 50]
 exploration_type = 0
 eps = 0.10
@@ -73,23 +73,22 @@ for o, a in opts:
     elif o in ("-max", "--max"):
         max_episodes = int(a)
 
-
-def main():
-    print routing_scheme
-    sim = Simulator()
-    testTopo = SpineLeaf(server, tor, core)
-    testTopo.CreateTopology()
-    sim.AssignTopology(topo=testTopo, cap=1.0 * Gb)
-    sim.AssignRoutingEngine(max_episodes, reward_type, features, number_hidden_nodes_per_layer, exploration_type,
-                            eps, setting, Routing=routing_scheme)
-    sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args="Input/trace.csv")
-    sim.setTraceFName(TraceFName=trace_FName)
-    print trace_FName
-    sim.setSchedType(FlowScheduler=TestFlowScheduler)
-    start_time = time.time()
-    sim.Run()
-    print time.time() - start_time
-
-
 if __name__ == "__main__":
-    main()
+    for v in (LB, ECMP, FlowLB, Qlearning):
+        # routing_scheme = v
+        print "routing scheme is {}".format(v)
+        sim = Simulator()
+        test_topo = SpineLeaf(server, tor, core)
+        test_topo.CreateTopology()
+        sim.AssignTopology(topo=test_topo, cap=1.0 * Gb)
+        sim.AssignRoutingEngine(max_episodes, reward_type, features, number_hidden_nodes_per_layer, exploration_type,
+                                eps, setting, Routing=v  # Routing=routing_scheme
+                                )
+        sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args="Input/trace.csv")
+        sim.setTraceFName(TraceFName=trace_FName)
+        print trace_FName
+        sim.setSchedType(FlowScheduler=TestFlowScheduler)
+        start_time = time.time()
+        sim.Run()
+        print time.time() - start_time
+        del sim
