@@ -1,13 +1,13 @@
-
-
 from Flow import *
+
 
 class Coflow:
     """
     Each job contains at least one flow. Each flow in the job
     For example, flow 3 will start just after flow 2 finished transferring.
     """
-    def __init__(self, id = 0):
+
+    def __init__(self, id=0):
         self.coflowId = id
         pass
 

@@ -1,12 +1,13 @@
 __author__ = 'li'
 
-from StepByStepSimulator import *
 import json
+
+from StepByStepSimulator import *
 
 sim = StepByStepSimulator(
     concurrency=5,
     simtime=0.01,
-    rtt=0.000001*100)
+    rtt=0.000001 * 100)
 flows = sim.geninput()
 
 flowdict = dict()

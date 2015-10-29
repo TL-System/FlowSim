@@ -1,5 +1,3 @@
-
-
 import os
 
 for mean in [10, 100, 300, 500]:

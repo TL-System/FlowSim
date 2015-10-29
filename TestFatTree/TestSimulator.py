@@ -1,13 +1,11 @@
-
-
 import sys
+
 sys.path.append("..")
 
 import getopt
 
 from Src.Simulator import *
 from TestFlowScheduler import *
-from Topology.FatTree import *
 from Routing.ECMP_FatTree import *
 
 # The port number of each switch in fat-tree topology
@@ -33,6 +31,8 @@ for o, a in opts:
         avgFlowNum = int(a)
     elif o in ("-f", "--f"):
         alpha = float(a)
+
+
 def main():
     sim = Simulator()
     testTopo = FatTree(K=K)
@@ -41,6 +41,7 @@ def main():
     sim.AssignRoutingEngine(Routing=ECMP)
     sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args=(K, flowSize, mean, avgFlowNum, alpha))
     sim.Run()
+
 
 if __name__ == "__main__":
     main()

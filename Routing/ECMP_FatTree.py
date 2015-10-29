@@ -1,17 +1,16 @@
-
-
 import sys
+
 sys.path.append("..")
 
 from Topology.FatTree import *
 from Src.Routing import *
 
-import gc
 
 class ECMP(Routing):
     """
     This routing approach is specific for fat-tree topology
     """
+
     def __init__(self, topo):
         Routing.__init__(self, topo)
         self.K = topo.K
@@ -33,7 +32,7 @@ class ECMP(Routing):
         Note that besides serverId, switch Id is required to convert into node id
         """
         for srcId in range(1, self.numOfServers + 1):
-            #gc.collect()        
+            # gc.collect()
             for dstId in range(1, self.numOfServers + 1):
                 self.CalculatePath(srcId=srcId, dstId=dstId)
 

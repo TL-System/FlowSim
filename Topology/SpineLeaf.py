@@ -1,5 +1,3 @@
-
-
 import sys
 
 sys.path.append("..")
@@ -7,7 +5,7 @@ sys.path.append("..")
 from Src.Topology import *
 from Src.Node import *
 from Src.Link import *
-from math import ceil, floor
+
 
 class SpineLeaf(Topology):
     def __init__(self, s, t, c):
@@ -37,7 +35,7 @@ class SpineLeaf(Topology):
             # t = self.numOfServers + s / self.serverPerRack
             t = self.numOfServers + s / self.serverPerRack
             # print s, self.serverPerRack, ceil(s / self.serverPerRack),
-        
+
             self.links[s, t] = Link((s, t))
             self.links[t, s] = Link((t, s))
 
@@ -49,11 +47,11 @@ class SpineLeaf(Topology):
                 self.links[c, t] = Link((c, t))
 
     def GetLinkNumbetweenSwitch(self):
-        return self.numOfCores*self.numOfToRs*2
+        return self.numOfCores * self.numOfToRs * 2
 
     def CreateNodes(self):
         # node id start from 1
-        #self.nodes.append(None)
+        # self.nodes.append(None)
         # append server node
         # [0, SERVER * TOR-1] are servers
         self.AddNodes(self.numOfServers)
@@ -123,10 +121,10 @@ class SpineLeaf(Topology):
         return self.nodes[nodeId]
 
     def GetCores(self):
-        return range(self.numOfServers+self.numOfToRs,
-                     self.numOfServers+self.numOfToRs+self.numOfCores)
+        return range(self.numOfServers + self.numOfToRs,
+                     self.numOfServers + self.numOfToRs + self.numOfCores)
 
-    def GetCoreLeastFlow(self):   #aborted 
+    def GetCoreLeastFlow(self):  # aborted
         cores = []
         for i in range(self.numOfCores):
             cores.append(self.GetCoreNode(i))
@@ -134,7 +132,7 @@ class SpineLeaf(Topology):
         dc = dict([(c, len(c.flowIds)) for c in cores])
         return min(dc, key=dc.get)
 
-    def GetCoreLeastQ(self):     #aborted 
+    def GetCoreLeastQ(self):  # aborted
         cores = []
         for i in range(self.numOfCores):
             cores.append(self.GetCoreNode(i))

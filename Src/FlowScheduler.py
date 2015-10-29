@@ -1,8 +1,4 @@
-
-
-from Unit import *
 # This file describes the class FlowScheduler
-import sys
 
 
 class FlowScheduler:
@@ -140,7 +136,7 @@ class FlowScheduler:
                 print "Error......"
             links_to_remove = []
             for link_id in current_links:
-                residual_cap[link_id] = residual_cap[link_id] - (bottleneck_rate*len(residual_flowIds[link_id]))
+                residual_cap[link_id] = residual_cap[link_id] - (bottleneck_rate * len(residual_flowIds[link_id]))
                 if residual_cap[link_id] <= 1.0e-20:
                     links_to_remove.append(link_id)
             for link_id in links_to_remove:

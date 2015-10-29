@@ -1,6 +1,6 @@
+import random
+import math
 
-
-import random, math
 
 class PoissonRand:
     """
@@ -12,6 +12,7 @@ class PoissonRand:
     Thus, we random generate a P in (0, 1) and calculate the delta_t by the equation above.
     Note that if P is extremely small, for example, P = 0, that leads to an infinite delta_t, therefore, we needs to set a bound.
     """
+
     def __init__(self, mean, bound):
         self.mean = mean
         self.bound = bound

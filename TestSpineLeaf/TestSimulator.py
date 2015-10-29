@@ -1,5 +1,3 @@
-
-
 import sys
 
 sys.path.append("..")
@@ -41,6 +39,7 @@ def main():
     sim.AssignRoutingEngine(Routing=ECMP)
     sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args=(flowSize, mean, avgFlowNum, alpha))
     sim.Run()
+
 
 if __name__ == "__main__":
     main()

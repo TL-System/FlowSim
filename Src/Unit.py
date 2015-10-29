@@ -1,5 +1,3 @@
-
-
 B = 8
 b = 1
 K = 1024
@@ -9,4 +7,3 @@ Mb = K * Kb
 MB = K * KB
 Gb = K * Mb
 GB = K * MB
-

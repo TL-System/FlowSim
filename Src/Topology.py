@@ -1,12 +1,10 @@
-
-
 from Unit import *
+
 
 # This file describes the design of class Topology
 # Note that each node and link can be customized class by inherit Node and Link
 
 class Topology:
-
     def __init__(self):
         # node list in topology. Node id is also the index in list. node id is start from 1
         self.nodes = []
@@ -19,6 +17,7 @@ class Topology:
         This function assigns the nodes and links.
         The parameter for this function could be a matrix or other things.
         """
+
     def SetAllCapacity(self, cap=1.0 * Gb):
         """
         Set capacity to all the links.
@@ -83,12 +82,3 @@ class Topology:
                     node.adjNodeIds.append(j)
                     self.links[i, j] = LinkType((i, j))
             self.nodes.append(node)
-
-        
-
-
-
-
-
-
-

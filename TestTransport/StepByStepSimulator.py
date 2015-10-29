@@ -1,8 +1,6 @@
 __author__ = 'li'
 
 import random
-import sys
-from datetime import datetime
 import csv
 import json
 import copy
@@ -10,26 +8,29 @@ import copy
 from Src import Flow, Link
 from TUnits import *
 
+
 # looking for examples supporting MCP
 # run simulator step by step, running for 100 milliseconds
 # simulating multiple flows over one link
 PROTO = ['tcp', 'mcp', 'd2tcp', 'dctcp', 'd3', 'mock']
+
+
 # PROTO = ['d2tcp']
 
 class StepByStepSimulator:
     # setting up environment
     def __init__(self,
-                 rtt=0.000001 * 80,     # 80us
-                 simtime=0.1,           # 0.1s = 100ms, 0.05s=50ms
+                 rtt=0.000001 * 80,  # 80us
+                 simtime=0.1,  # 0.1s = 100ms, 0.05s=50ms
                  concurrency=5,
-                 flowsizemean=0.01,     # 0.1MB = 100KB 0.1MB/100ms=100KB/50ms=0.0016Gbps
-                                        # 0.01MB = 10KB =1.6Gbps
-                 flowddlmean=0.001 * 50,# 50ms
-                 ecn=64,                # 64 packets
-                 maxbuffer=4,           # 4MB
-                 linkcap=1000,          # BDP = 10KB -> 1Gbps
+                 flowsizemean=0.01,  # 0.1MB = 100KB 0.1MB/100ms=100KB/50ms=0.0016Gbps
+                 # 0.01MB = 10KB =1.6Gbps
+                 flowddlmean=0.001 * 50,  # 50ms
+                 ecn=64,  # 64 packets
+                 maxbuffer=4,  # 4MB
+                 linkcap=1000,  # BDP = 10KB -> 1Gbps
                  output='results.txt',
-                 inputf=''):            # assuming txt file
+                 inputf=''):  # assuming txt file
         self.RTT = rtt
         self.SIMTIME = simtime
         self.Steps = int(round(simtime / rtt))
@@ -51,7 +52,7 @@ class StepByStepSimulator:
         self.missrate = dict(mcp=0, tcp=0, dctcp=0, d2tcp=0)
         self.mcpwins = False
         # clear outputs
-        open('Out/'+self.fname, 'w').close()
+        open('Out/' + self.fname, 'w').close()
         if inputf == '':
             self.hasInput = False
         else:
@@ -121,12 +122,12 @@ class StepByStepSimulator:
             if CongestionPercentage > 0:
                 cWin = flow.bw * self.RTT
                 Ts = (4.0 * flow.remainSize / (3.0 * flow.bw * self.RTT))  # following paper
-                Urgency = abs (Ts / flow.remainTime)
+                Urgency = abs(Ts / flow.remainTime)
                 cWin *= (1.0 - (CongestionPercentage ** Urgency) / 2.0)
                 flow.bw = cWin / self.RTT
             else:
                 flow.bw += (PKTSIZE / self.RTT)
-            # print "after rate(), {}".format(flow.remainTime)
+                # print "after rate(), {}".format(flow.remainTime)
         elif flow.transport == 'mcp':
             cWin = flow.bw * self.RTT
             ExpectedRate = flow.remainSize / flow.remainTime
@@ -164,7 +165,7 @@ class StepByStepSimulator:
             for f in Flows:
                 f.transport = proto
                 if proto == 'dctcp' or proto == 'tcp' or proto == 'd2tcp':
-                # if proto == 'mcp':
+                    # if proto == 'mcp':
                     # f.bw = f.remainSize / f.remainTime
                     f.bw = 2 * PKTSIZE / self.RTT
 
@@ -209,8 +210,8 @@ class StepByStepSimulator:
                         f.residualRate = max(0.001, f.residualRate)
                     f.bw = max(0.001, f.bw)
                     f.remainTime -= 1
-                # for f in ActiveFlow:
-                    if f.remainSize < 0.0:  #and f.remainTime >= 0:
+                    # for f in ActiveFlow:
+                    if f.remainSize < 0.0:  # and f.remainTime >= 0:
                         print 'flow {} is finished at {}'.format(f.flowId, t)
                         f.finishTime = t
                         DeadFlow.append(f)
@@ -220,14 +221,14 @@ class StepByStepSimulator:
                         f.finishTime = t  # unfinished
                         MissFlow.append(f)
                         ActiveFlow.remove(f)
-                    # f.remainTime -= 1
+                        # f.remainTime -= 1
 
             for af in ActiveFlow:
                 af.finishTime = t
             MissFlow.sort(key=lambda f: f.flowId)
             ActiveFlow.sort(key=lambda f: f.flowId)
             self.missrate[proto] = 100.0 * (len(MissFlow) + len(ActiveFlow)) / len(Flows)
-            with open('Out/'+self.fname, "ab") as f:
+            with open('Out/' + self.fname, "ab") as f:
                 f.write('{}: Total number of flows: {}\n'.format(proto, len(Flows)))
                 f.write('{}: Completed flows: {}\n'.format(proto, len(DeadFlow)))
                 f.write('{}: Missed flows: {}\n'.format(proto, len(MissFlow) + len(ActiveFlow)))
@@ -248,8 +249,8 @@ class StepByStepSimulator:
             allflow = MissFlow + ActiveFlow + DeadFlow
             with open('In/{}'.format(proto) + str(dt) + '.csv', 'wb') as csvfile:
                 flowwriter = csv.writer(csvfile)
-                flowwriter.writerow([proto+'_flow_id', proto+'_deadline', proto+'_flowSize',
-                                     proto+'_startTime', proto+'_finishTime', proto+'_fct'])
+                flowwriter.writerow([proto + '_flow_id', proto + '_deadline', proto + '_flowSize',
+                                     proto + '_startTime', proto + '_finishTime', proto + '_fct'])
                 for f in allflow:
                     flowwriter.writerow([
                         f.flowId,
@@ -257,18 +258,18 @@ class StepByStepSimulator:
                         f.flowSize,
                         f.startTime,
                         f.finishTime,
-                        max(0, f.finishTime-f.startTime)
+                        max(0, f.finishTime - f.startTime)
                     ])
                 csvfile.close()
 
-            with open('Out/{}'.format(proto)+'_rates.csv', 'wb') as csvfile:
+            with open('Out/{}'.format(proto) + '_rates.csv', 'wb') as csvfile:
                 flowwriter = csv.writer(csvfile)
                 flowwriter.writerow(self.linkrates[proto])
                 csvfile.close()
 
         mintrans = min(self.missrate, key=self.missrate.get)
         if mintrans == 'mcp':
-        #     write flows to csv
+            #     write flows to csv
             self.mcpwins = True
 
 
@@ -276,10 +277,10 @@ if __name__ == "__main__":
     Rtt = 0.001
     sim = StepByStepSimulator(
         rtt=Rtt,
-        simtime=Rtt*10,
+        simtime=Rtt * 10,
         concurrency=2,
         flowsizemean=0.002,
-        flowddlmean=1*Rtt,
+        flowddlmean=1 * Rtt,
         linkcap=1000,
         inputf='Out/flow10.json')
     # when in doubt, use brute force

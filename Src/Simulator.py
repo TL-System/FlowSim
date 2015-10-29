@@ -1,17 +1,17 @@
-
-
 from Unit import *
 from TestHuawei.Input.make_trace import *
-#from Src.Flow import *
-#import sys
-#sys.path.append("..")
+
+
+# from Src.Flow import *
+# import sys
+# sys.path.append("..")
 # Flow-level simulator written in python.
 # This file describes the design of class Simulator.
 # from Topology.SpineLeaf import *
-#print sys.path
-#from Routing.ECMP_SpineLeaf import *
-#from Routing.LB_SpineLeaf import *  
-#from Routing.Qlearning_SpineLeaf import *
+# print sys.path
+# from Routing.ECMP_SpineLeaf import *
+# from Routing.LB_SpineLeaf import *
+# from Routing.Qlearning_SpineLeaf import *
 class Simulator:
     def __init__(self):
         pass
@@ -27,7 +27,8 @@ class Simulator:
         # link_3_2 = self.topo.link[3,2]                    #(3,2) is link id
         # self.topo.SetLinkCapacity((5, 7), 10.0 * Gb)      #set link_5_7 with capacity 10Gbps
 
-    def AssignRoutingEngine(self, max_episodes, reward_type, features, number_hidden_nodes_per_layer, exploration_type, epsilon, setting, Routing):
+    def AssignRoutingEngine(self, max_episodes, reward_type, features, number_hidden_nodes_per_layer, exploration_type,
+                            epsilon, setting, Routing):
         """
         Assign the routing method in a centralized way.
         Routing is a function that takes topo as input
@@ -38,7 +39,8 @@ class Simulator:
         self.setting = setting
         self.max_episodes = max_episodes
         if str(Routing) == "Routing.Qlearning_SpineLeaf.Qlearning":
-            self.routing = Routing(self.number_state_vectors, number_hidden_nodes_per_layer, exploration_type, epsilon, self.topo)
+            self.routing = Routing(self.number_state_vectors, number_hidden_nodes_per_layer, exploration_type, epsilon,
+                                   self.topo)
         else:
             self.routing = Routing(self.topo)
         self.Qlearning_enable = 0
@@ -46,25 +48,26 @@ class Simulator:
         if str(Routing) == "Routing.Qlearning_SpineLeaf.Qlearning":
             self.Qlearning_enable = 1
             print "linkNum between Switches: ", self.topo.GetLinkNumbetweenSwitch()
-            self.LinkUtilization = [0.0]*self.topo.GetLinkNumbetweenSwitch()
-            self.ActiveFlowNum = [0]*self.topo.GetLinkNumbetweenSwitch()
-            self.ActiveElephantFlowNum = [0]*self.topo.GetLinkNumbetweenSwitch()
-            self.ActiveFlowRemainSize = [0.0]*self.topo.GetLinkNumbetweenSwitch()
+            self.LinkUtilization = [0.0] * self.topo.GetLinkNumbetweenSwitch()
+            self.ActiveFlowNum = [0] * self.topo.GetLinkNumbetweenSwitch()
+            self.ActiveElephantFlowNum = [0] * self.topo.GetLinkNumbetweenSwitch()
+            self.ActiveFlowRemainSize = [0.0] * self.topo.GetLinkNumbetweenSwitch()
             self.state = []
-            #print len(self.topo.GetLinks())
+            # print len(self.topo.GetLinks())
             self.reward = [0.0, 0.0]
             self.stateId = 0
-            #self.logfname = "StateLog.csv"
-            #self.logf = open(self.logDir + self.logfname, "w")
-        #self.updatenum=0
+            # self.logfname = "StateLog.csv"
+            # self.logf = open(self.logDir + self.logfname, "w")
+        # self.updatenum=0
         elif str(Routing) == "Routing.ECMP_SpineLeaf.ECMP":
             self.Qlearning_enable = 2
-            self.LinkUtilization = [0.0]*self.topo.GetLinkNumbetweenSwitch()
+            self.LinkUtilization = [0.0] * self.topo.GetLinkNumbetweenSwitch()
         elif str(Routing) == "Routing.FlowLB_SpineLeaf.FlowLB":
             self.Qlearning_enable = 3
-            self.LinkUtilization = [0.0]*self.topo.GetLinkNumbetweenSwitch()
-        # We can get path by
-        # path_3_5 = self.routing.GetPath(3,5)             # result is a list with node ids
+            self.LinkUtilization = [0.0] * self.topo.GetLinkNumbetweenSwitch()
+            # We can get path by
+            # path_3_5 = self.routing.GetPath(3,5)             # result is a list with node ids
+
     def setSchedType(self, FlowScheduler):
         self.schedType = FlowScheduler
 
@@ -75,47 +78,49 @@ class Simulator:
         """
         Assign the flow scheduler. It also assign the flows to be scheduled.
         """
-        #self.schedType = FlowScheduler
+        # self.schedType = FlowScheduler
         self.sched = FlowScheduler()
         self.sched.AssignFlows(self.topo, args)
         self.sched.AssignLinks(self.topo.GetLinks())
         self.sched.AssignNodes(self.topo.GetNodes())
         self.flows = self.sched.GetAllFlows()
-        self.norm_trans_time = [0.0]*len(self.flows)
-       # for flow in self.flows:
-       #     self.routing.BuildPath(flow.startId, flow.endId)
-       #     pathNodeIds = self.routing.GetPath(flow.startId, flow.endId)
-       #     flow.BuildPath(pathNodeIds)
+        self.norm_trans_time = [0.0] * len(self.flows)
+        # for flow in self.flows:
+        #     self.routing.BuildPath(flow.startId, flow.endId)
+        #     pathNodeIds = self.routing.GetPath(flow.startId, flow.endId)
+        #     flow.BuildPath(pathNodeIds)
 
     def AssignLoadBalancer(self, LoadBalancer, args):
         self.lb = LoadBalancer()
 
     def Update(self, flow):
-        #update state list by dimension
+        # update state list by dimension
         dim_id = 0
         for key in self.sched.Links.keys():
             if key[0] >= self.topo.numOfServers and key[1] >= self.topo.numOfServers:
-               self.LinkUtilization[dim_id] = self.sched.Links[key].GetLinkUtilization(self.flows)
-               self.ActiveFlowNum[dim_id] = self.sched.Links[key].GetActiveFlowNum()
-               self.ActiveElephantFlowNum[dim_id] = self.sched.Links[key].GetActiveElephantFlowNum(self.flows)
-               self.ActiveFlowRemainSize[dim_id] = self.sched.Links[key].GetActiveFlowRemainSize(self.flows)
-               dim_id += 1
-        
+                self.LinkUtilization[dim_id] = self.sched.Links[key].GetLinkUtilization(self.flows)
+                self.ActiveFlowNum[dim_id] = self.sched.Links[key].GetActiveFlowNum()
+                self.ActiveElephantFlowNum[dim_id] = self.sched.Links[key].GetActiveElephantFlowNum(self.flows)
+                self.ActiveFlowRemainSize[dim_id] = self.sched.Links[key].GetActiveFlowRemainSize(self.flows)
+                dim_id += 1
+
         # reward of type 1
-        #r1 = - 1.0 / (flow.bw/(1024.0*1024.0)) * 2
-        r1 = flow.bw/(1024.0*1024.0*1024.0)
+        # r1 = - 1.0 / (flow.bw/(1024.0*1024.0)) * 2
+        r1 = flow.bw / (1024.0 * 1024.0 * 1024.0)
         # reward of type 2
         r2 = 0.0
         for linkId in flow.pathLinkIds:
             link = self.sched.Links[linkId]
-            if linkId[0] >= self.topo.numOfServers and linkId[1] >= self.topo.numOfServers and link.GetLinkUtilization(self.flows) > r2:
+            if linkId[0] >= self.topo.numOfServers and linkId[1] >= self.topo.numOfServers and link.GetLinkUtilization(
+                    self.flows) > r2:
                 r2 = link.GetLinkUtilization(self.flows)
         r2 = -r2
         # reward of type 3
         r3 = 0.0
         for linkId in flow.pathLinkIds:
             link = self.sched.Links[linkId]
-            if linkId[0] >= self.topo.numOfServers and linkId[1] >= self.topo.numOfServers and link.GetActiveElephantFlowNum(self.flows) / 100.0 > r3:
+            if linkId[0] >= self.topo.numOfServers and linkId[
+                1] >= self.topo.numOfServers and link.GetActiveElephantFlowNum(self.flows) / 100.0 > r3:
                 r3 = link.GetActiveElephantFlowNum(self.flows) / 100.0
         r3 = -r3
         self.reward = [r1, r2, r3]
@@ -142,9 +147,9 @@ class Simulator:
             self.logfname2 = "FCT_FlowLB" + self.setting + ".csv"
             self.logf2 = open(self.logDir + self.logfname2, "w")
         for episode in range(self.max_episodes):
-            #print "episode number ", episode+1
-            #generate_trace()
-            #self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
+            # print "episode number ", episode+1
+            # generate_trace()
+            # self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
             self.sched.toStartFlows = self.sched.flows[:]
             self.sched.toStartFlows.sort(key=lambda x: x.startTime)
             self.sched.runningFlows = []
@@ -156,15 +161,15 @@ class Simulator:
                 flow.updateTime = 0.0
                 flow.finishTime = 0.0
                 flow.remainSize = flow.flowSize
-           
-            #if self.Qlearning_enable == 1:
+
+            # if self.Qlearning_enable == 1:
             #   self.logfname = "StateLog" + str(episode) + ".csv"
             #   self.logf = open(self.logDir + self.logfname, "w")
             total_reward = 0
             total_reward2 = 0
             counter = 0
             while self.sched.toStartFlows:
-                #print counter
+                # print counter
                 counter += 1
                 # the first flow is with earliest startTime
                 curStartFlow = self.sched.toStartFlows[0]
@@ -185,12 +190,12 @@ class Simulator:
                         if self.Qlearning_enable == 1:
                             self.action = toFinishFlow.pathNodeIds
                             if len(self.action) == 5:
-                               self.pre_LinkUtilization = self.LinkUtilization[:]
-                               self.pre_ActiveFlowNum = self.ActiveFlowNum[:]
-                               self.pre_ActiveElephantFlowNum = self.ActiveElephantFlowNum[:]
-                               self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
-                               self.Update(toFinishFlow)
-                               #self.printQlearningLog()
+                                self.pre_LinkUtilization = self.LinkUtilization[:]
+                                self.pre_ActiveFlowNum = self.ActiveFlowNum[:]
+                                self.pre_ActiveElephantFlowNum = self.ActiveElephantFlowNum[:]
+                                self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
+                                self.Update(toFinishFlow)
+                                # self.printQlearningLog()
 
                     else:
                         break
@@ -212,18 +217,18 @@ class Simulator:
                         self.pre_LinkUtilization = self.LinkUtilization[:]
                 # update state and reward for Qlearning algorithm
                 self.sched.UpdateFlow2(curStartFlow, "insert")
-                #self.updatenum += 1
-                #print "updatenum= ",self.updatenum
+                # self.updatenum += 1
+                # print "updatenum= ",self.updatenum
                 if self.Qlearning_enable == 1:
                     self.action = curStartFlow.pathNodeIds
                     if len(self.action) == 5:
-                        #self.pre_state = self.state[:]
+                        # self.pre_state = self.state[:]
                         self.pre_LinkUtilization = self.LinkUtilization[:]
                         self.pre_ActiveFlowNum = self.ActiveFlowNum[:]
                         self.pre_ActiveElephantFlowNum = self.ActiveElephantFlowNum[:]
                         self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
                         self.Update(curStartFlow)
-                        #self.printQlearningLog()
+                        # self.printQlearningLog()
                         if self.reward_type == 0:
                             reward = self.reward[0]
                         elif self.reward_type == 1:
@@ -231,7 +236,8 @@ class Simulator:
                         elif self.reward_type == 2:
                             reward = self.reward[2]
                         elif self.reward_type == 3:
-                            reward = max([(self.LinkUtilization[i] - self.pre_LinkUtilization[i]) for i in range(len(self.LinkUtilization))])
+                            reward = max([(self.LinkUtilization[i] - self.pre_LinkUtilization[i]) for i in
+                                          range(len(self.LinkUtilization))])
                         total_reward += reward
                         self.pre_state = []
                         self.state = []
@@ -247,22 +253,25 @@ class Simulator:
                         if 3 in self.features:
                             self.pre_state = self.pre_state + [x / 100.0 for x in self.pre_ActiveFlowNum]
                             self.state = self.state + [x / 100.0 for x in self.ActiveFlowNum]
-                        self.routing.update(self.pre_state, self.action[1], self.action[3], self.action[2], self.state, reward)
+                        self.routing.update(self.pre_state, self.action[1], self.action[3], self.action[2], self.state,
+                                            reward)
                 elif self.Qlearning_enable == 2 or self.Qlearning_enable == 3:
                     if self.reward_type == 0:
-                        total_reward2 += curStartFlow.bw/(1024.0*1024.0*1024.0)
+                        total_reward2 += curStartFlow.bw / (1024.0 * 1024.0 * 1024.0)
                     elif self.reward_type == 1:
                         r = 0.0
                         for linkId in curStartFlow.pathLinkIds:
                             link = self.sched.Links[linkId]
-                            if linkId[0] >= self.topo.numOfServers and linkId[1] >= self.topo.numOfServers and link.GetLinkUtilization(self.flows) > r:
+                            if linkId[0] >= self.topo.numOfServers and linkId[
+                                1] >= self.topo.numOfServers and link.GetLinkUtilization(self.flows) > r:
                                 r = link.GetLinkUtilization(self.flows)
                         total_reward2 += -r
                     elif self.reward_type == 2:
                         r = 0.0
                         for linkId in curStartFlow.pathLinkIds:
                             link = self.sched.Links[linkId]
-                            if linkId[0] >= self.topo.numOfServers and linkId[1] >= self.topo.numOfServers and link.GetActiveElephantFlowNum(self.flows) / 100.0 > r:
+                            if linkId[0] >= self.topo.numOfServers and linkId[
+                                1] >= self.topo.numOfServers and link.GetActiveElephantFlowNum(self.flows) / 100.0 > r:
                                 r = link.GetActiveElephantFlowNum(self.flows) / 100.0
                         total_reward2 += -r
                     elif self.reward_type == 3:
@@ -271,7 +280,8 @@ class Simulator:
                             if key[0] >= self.topo.numOfServers and key[1] >= self.topo.numOfServers:
                                 self.LinkUtilization[dim_id] = self.sched.Links[key].GetLinkUtilization(self.flows)
                                 dim_id += 1
-                        total_reward2 += max([(self.LinkUtilization[i] - self.pre_LinkUtilization[i]) for i in range(len(self.LinkUtilization))])
+                        total_reward2 += max([(self.LinkUtilization[i] - self.pre_LinkUtilization[i]) for i in
+                                              range(len(self.LinkUtilization))])
                 # Resort runningFlows by endTime
                 self.sched.runningFlows.sort(key=lambda x: x.finishTime)
                 # remove this flow from start list
@@ -295,26 +305,26 @@ class Simulator:
                 if self.Qlearning_enable == 1:
                     self.action = curFinishFlow.pathNodeIds
                     if len(self.action) == 5:
-                       self.pre_LinkUtilization = self.LinkUtilization[:]
-                       self.pre_ActiveFlowNum = self.ActiveFlowNum[:]
-                       self.pre_ActiveElephantFlowNum = self.ActiveElephantFlowNum[:]
-                       self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
-                       self.Update(curFinishFlow)
-                       #self.printQlearningLog()
+                        self.pre_LinkUtilization = self.LinkUtilization[:]
+                        self.pre_ActiveFlowNum = self.ActiveFlowNum[:]
+                        self.pre_ActiveElephantFlowNum = self.ActiveElephantFlowNum[:]
+                        self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
+                        self.Update(curFinishFlow)
+                        # self.printQlearningLog()
 
             # Finally, all the flows are finished
             self.sched.PrintFlows()
-            #if self.Qlearning_enable == 1:
+            # if self.Qlearning_enable == 1:
             #    self.logf.close()
             # print "final stateId= ", self.stateId
-            
-            #collect normalized transmission time of all flows
+
+            # collect normalized transmission time of all flows
             self.average_norm_trans_time = 0.0
             for flow in self.flows:
-                self.norm_trans_time[flow.flowId] = (flow.finishTime-flow.startTime)/flow.flowSize
+                self.norm_trans_time[flow.flowId] = (flow.finishTime - flow.startTime) / flow.flowSize
                 self.average_norm_trans_time += self.norm_trans_time[flow.flowId]
             self.average_norm_trans_time /= len(self.flows)
-            #print "average normalized (per bit) transmission time",self.average_norm_trans_time
+            # print "average normalized (per bit) transmission time",self.average_norm_trans_time
             if self.Qlearning_enable == 1:
                 print >> self.logf, "%f" % (total_reward / counter)
                 print >> self.logf2, "%e" % self.average_norm_trans_time
@@ -326,22 +336,23 @@ class Simulator:
                 print total_reward2 / counter, self.average_norm_trans_time
         self.logf.close()
         self.logf2.close()
-    
+
     def printQlearningLog(self):
-        print >> self.logf, "%d,%d,%d,%f,%f" % (self.stateId, self.stateId + 1, self.action[2], self.reward[0], self.reward[1])
-      #  flag = 0
-        statename_list =["LinkUtilization","ActiveFlowNum","ActiveElephantFlowNum","ActiveFlowRemainSize"]
+        print >> self.logf, "%d,%d,%d,%f,%f" % (
+        self.stateId, self.stateId + 1, self.action[2], self.reward[0], self.reward[1])
+        #  flag = 0
+        statename_list = ["LinkUtilization", "ActiveFlowNum", "ActiveElephantFlowNum", "ActiveFlowRemainSize"]
         for statename in statename_list:
             state_fname = str("state_" + str(statename) + "_" + str(self.stateId))
             statef = open(self.logDir + state_fname, "w")
             # select the flow attribution to print
-            flowattr_toprint= getattr(self, "pre_" + statename)
+            flowattr_toprint = getattr(self, "pre_" + statename)
             # print flowattr_toprint
             for a in flowattr_toprint:
                 if statename == "LinkUtilization" or statename == "ActiveFlowRemainSize":
                     print >> statef, "%f" % (a)
                 elif statename == "ActiveFlowNum" or statename == "ActiveElephantFlowNum":
-                    print >> statef, "%d" %(a)
+                    print >> statef, "%d" % (a)
 
             statef.close()
         self.stateId += 1
@@ -349,18 +360,18 @@ class Simulator:
         for statename in statename_list:
             state_fname = str("state_" + str(statename) + "_" + str(self.stateId))
             statef = open(self.logDir + state_fname, "w")
-            flowattr_toprint= getattr(self, statename)
-            #print flowattr_toprint
+            flowattr_toprint = getattr(self, statename)
+            # print flowattr_toprint
             for a in flowattr_toprint:
-               # print "a= ",a
+                # print "a= ",a
                 if statename == "LinkUtilization" or statename == "ActiveFlowRemainSize":
                     print >> statef, "%f" % (a)
                 elif statename == "ActiveFlowNum" or statename == "ActiveElephantFlowNum":
-                    print >> statef, "%d" %(a)
+                    print >> statef, "%d" % (a)
             statef.close()
         self.stateId += 1
 
-    def changeSpine(self, curStartFlow, spine):  #aborted
+    def changeSpine(self, curStartFlow, spine):  # aborted
         curStartFlow.pathLinkIds[1] = (curStartFlow.pathLinkIds[1][0], spine.nodeId)
         curStartFlow.pathLinkIds[2] = (spine.nodeId, curStartFlow.pathLinkIds[2][1])
         curStartFlow.pathNodeIds[2] = spine.nodeId

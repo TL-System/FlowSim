@@ -17,7 +17,5 @@ for l in cr:
 for l in cr:
     fid, m, h, e = l.split(',')
 
-
 f.close()
 r.close()
-

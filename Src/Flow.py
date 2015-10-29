@@ -1,7 +1,3 @@
-
-
-from Unit import *
-
 # This file describes the class Flow.
 # Any specific flow class should inherit from this class
 
@@ -79,5 +75,5 @@ class Flow:
         self.pathNodeIds = pathNodeIds
         # Build path in link ids
         # Append tuple of nodes as links.
-        for i in range(len(pathNodeIds)-1):
-            self.pathLinkIds.append((pathNodeIds[i], pathNodeIds[i+1]))
+        for i in range(len(pathNodeIds) - 1):
+            self.pathLinkIds.append((pathNodeIds[i], pathNodeIds[i + 1]))

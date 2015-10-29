@@ -1,10 +1,7 @@
-
-
 # This file describes the base class of node
 # All the specific node class should inherit this class
 
 class Node:
-
     def __init__(self):
         # node ID
         self.nodeId = -1

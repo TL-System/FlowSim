@@ -2,6 +2,7 @@ __author__ = 'li'
 
 import random
 
+
 def weighted_choice(choices):
     total = sum([choices[c] for c in choices])
     r = random.uniform(0, total)
@@ -12,8 +13,9 @@ def weighted_choice(choices):
         upto += choices[c]
     assert False, "Shouldn't get here"
 
+
 # Usage example
-if __name__=="__main__":
+if __name__ == "__main__":
     choice = ['a', 'b', 'c', 'd']
     weight = [1, 2, 3, 4]
     css = dict(zip(choice, weight))

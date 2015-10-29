@@ -1,9 +1,9 @@
-
 class PowerLaw:
     """
     This class is used to generate power-law distribution.
     """
-    def __init__(self, alpha=1.0, totalNums = 1000, rank=100):
+
+    def __init__(self, alpha=1.0, totalNums=1000, rank=100):
         self.alpha = alpha
         self.N = totalNums
         self.rankRange = rank
@@ -40,4 +40,3 @@ class PowerLaw:
             else:
                 break
         return dist
-

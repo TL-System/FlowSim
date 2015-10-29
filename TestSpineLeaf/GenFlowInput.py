@@ -1,9 +1,8 @@
-
-
 import sys
+
 sys.path.append("..")
 
-import random, getopt
+import getopt
 from RandomGenerator.Poisson import *
 from Src.Unit import *
 
@@ -24,6 +23,7 @@ for o, a in opts:
         avgFlowNum = int(a)
 
 inDir = "Input/"
+
 
 def SpineLeafFlowInput():
     """
@@ -47,6 +47,7 @@ def SpineLeafFlowInput():
             print >> f, "%d\t%d\t%d\t%f" % (startId, endId, flowSize, startTime)
 
     f.close()
+
 
 if __name__ == "__main__":
     SpineLeafFlowInput()

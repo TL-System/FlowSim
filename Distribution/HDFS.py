@@ -1,13 +1,16 @@
 import sys
+
 sys.path.append("..")
 
 import random, math
 from Topology.FatTree import *
 
+
 class AllocChunks:
     """
     This class builds the chunks distribution in HDFS.
     """
+
     def __init__(self, M, d, n, topo):
         """
         M: the rank range of items, it indicates the number of distinct chunks in HDFS
@@ -102,5 +105,3 @@ class AllocChunks:
 
     def __del__(self):
         pass
-
-

@@ -2,14 +2,14 @@ __author__ = 'li'
 
 from StepByStepSimulator import *
 
-sim = StepByStepSimulator(rtt=0.000001 * 80,        # 80us
-                          simtime=1,                # 1s = 1000ms
+sim = StepByStepSimulator(rtt=0.000001 * 80,  # 80us
+                          simtime=1,  # 1s = 1000ms
                           concurrency=5,
-                          flowsizemean=0.1,         # 0.1MB = 100KB 0.1MB/100ms=100KB/100ms=8000bps=8Gbps
-                          flowddlmean=0.001 * 50,   # 50ms
-                          ecn=64,                   # 64 packets
-                          maxbuffer=12,             # 12MB
-                          linkcap=10,               # 1Gbps
+                          flowsizemean=0.1,  # 0.1MB = 100KB 0.1MB/100ms=100KB/100ms=8000bps=8Gbps
+                          flowddlmean=0.001 * 50,  # 50ms
+                          ecn=64,  # 64 packets
+                          maxbuffer=12,  # 12MB
+                          linkcap=10,  # 1Gbps
                           output='results.txt')
 
 if __name__ == "__main__":
@@ -29,8 +29,8 @@ if __name__ == "__main__":
                                                   maxbuffer=12,
                                                   linkcap=cap,
                                                   output='Out/rtt{}concur{}size{}ddl{}cap{}.txt'.format(rtt,
-                                                                                                    concur,
-                                                                                                    size,
-                                                                                                    ddl,
-                                                                                                    cap))
+                                                                                                        concur,
+                                                                                                        size,
+                                                                                                        ddl,
+                                                                                                        cap))
                         sim.run()

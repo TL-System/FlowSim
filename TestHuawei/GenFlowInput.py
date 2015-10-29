@@ -1,9 +1,8 @@
-
-
 import sys
+
 sys.path.append("..")
 
-import random, getopt
+import getopt
 from RandomGenerator.Poisson import *
 from Src.Unit import *
 
@@ -25,6 +24,7 @@ for o, a in opts:
 
 inDir = "Input/"
 
+
 def SpineLeafFlowInput():
     """
     This is function is used to generate flows launched in a Spine-Leaf topology.
@@ -40,13 +40,14 @@ def SpineLeafFlowInput():
     for j in range(avgFlowNum):
         for i in range(0, flowNums):
             startId = i
-            endId = random.randint(0, flowNums-1)
+            endId = random.randint(0, flowNums - 1)
             if endId == startId:
                 endId = (startId + random.randint(1, flowNums / 2)) % flowNums
             startTime += randPoisson.GetPoissonNumber()
             print >> f, "%d\t%d\t%d\t%f" % (startId, endId, flowSize, startTime)
 
     f.close()
+
 
 if __name__ == "__main__":
     SpineLeafFlowInput()

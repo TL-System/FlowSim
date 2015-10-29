@@ -30,7 +30,7 @@ mock = list(reader)
 # for i in range(len(tcp[0])):
 #     tcp[0][i] = 'tcp_' + tcp[0][i]
 
-result = [a+b+c+d+e+f for (a, b, c, d, e, f) in zip(mcp, d2tcp, dctcp, tcp, d3, mock)]
+result = [a + b + c + d + e + f for (a, b, c, d, e, f) in zip(mcp, d2tcp, dctcp, tcp, d3, mock)]
 
 writer = csv.writer(open("all.csv", "wb"))
 writer.writerows(result)

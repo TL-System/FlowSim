@@ -1,17 +1,16 @@
-
-
 import sys
+
 sys.path.append("..")
 
-from Topology.SpineLeaf import *
 from Src.Routing import *
 from random import choice
-import gc
+
 
 class ECMP(Routing):
     """
     This routing approach is specific for spine-leaf topology
     """
+
     def __init__(self, topo):
         Routing.__init__(self, topo)
         self.numOfServers = topo.numOfServers
@@ -31,7 +30,7 @@ class ECMP(Routing):
         For spine-leaf, choosing a path is essentially choosing a spine to traverse
         """
         for srcId in range(self.numOfServers):
-            #gc.collect()
+            # gc.collect()
             for dstId in range(self.numOfServers):
                 self.CalculatePath(srcId=srcId, dstId=dstId)
 
@@ -49,7 +48,8 @@ class ECMP(Routing):
         # src-dst must traverse core
         else:
             # prick random core
-            rcore = choice(range(self.numOfServers + self.numOfToRs, self.numOfServers + self.numOfToRs + self.numOfCores))
+            rcore = choice(
+                range(self.numOfServers + self.numOfToRs, self.numOfServers + self.numOfToRs + self.numOfCores))
             self.pathList[srcId, dstId] = [srcId, srcToRId, rcore, dstToRId, dstId]
 
     def __del__(self):
