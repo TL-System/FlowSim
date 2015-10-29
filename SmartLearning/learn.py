@@ -4,12 +4,13 @@ import numpy as np
 
 class Learn:
     def __init__(self, number_actions, number_sources, number_destinations, number_state_features, number_hidden_nodes_per_layer, activation_function_type, exploration_type, epsilon, alpha, gamma, beta, learning_rate):
+        np.seterr(all='raise')
         activation_functions = {0: logistic, 1: tanh, 2: softplus, 3: rectified_linear, 4: identity}
         activation_function_primes = {0: logistic_prime, 1: tanh_prime, 2: softplus_prime, 3: rectified_linear_prime, 4: identity_prime}
         hidden_info = ()
         for i in range(0, len(number_hidden_nodes_per_layer)):
             hidden_info = hidden_info + ((number_hidden_nodes_per_layer[i], activation_functions[activation_function_type], activation_function_primes[activation_function_type]),)
-        param = ((number_state_features + + number_sources + number_destinations + number_actions, 0, 0),) + hidden_info + ((1, identity, identity_prime),)
+        param = ((number_state_features + number_sources + number_destinations + number_actions, 0, 0),) + hidden_info + ((1, identity, identity_prime),)
 
         self.NN = nn.NeuralNetwork(param, learning_rate)
         self.rho = random.gauss(0, 1)
@@ -36,12 +37,13 @@ class Learn:
 
     def choose_action(self, state, source, destination):
         if self.exploration_type == 1:
-            if self.K < 1000:
-                self.epsilon = -(0.95/999)*self.K + 999.95/999
+            if self.K < 1000000:
+                #self.epsilon = -(0.95/99999)*self.K + 999.95/99999
+                self.epsilon = -(1.0/1111110)*self.K + 1111111/1111110.0
                 self.K += 1
             else:
-                self.epsilon = 0.05
-        if random.random() < self.epsilon:
+                self.epsilon = 0.10
+        if state == [] or random.random() < self.epsilon:
             action = random.choice(range(self.number_actions))
             self.action = action
         else:
@@ -94,11 +96,20 @@ class Learn:
             self.rho += self.beta * (reward - self.rho + maxqnew - maxqprevious)
 
 def logistic(x):
-    return 1.0/(1 + np.exp(-x))
+    try:
+        ex = 1.0/(1 + np.exp(-x))
+    except Exception,e:
+        print e
+        print x
+    return ex
 
 def logistic_prime(x):
-    ex = np.exp(-x)
-    return ex / (1 + ex)**2
+    try:
+        ex = 1.0/(1 + np.exp(-x))
+    except:
+        print x
+        print ex
+    return ex * (1 - ex)
 
 def identity(x):
     return x

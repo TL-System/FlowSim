@@ -47,7 +47,7 @@ class TestFlowScheduler(FlowScheduler):
             #    break
 
         FlowScheduler.AssignFlows(self)
-        print "number of input flows = ",len(self.flows)
+        #print "number of input flows = ",len(self.flows)
         f.close()
 
         f = open("Input/coflow_in.csv","w")
@@ -68,7 +68,7 @@ class TestFlowScheduler(FlowScheduler):
         average_flowTransTime = 0.0
         flowTransTimes = []
         for flow in self.finishedFlows:
-            flowTransTime = flow.finishTime - flow.startTime
+            flowTransTime = (flow.finishTime - flow.startTime)/flow.flowSize
             average_flowTransTime += flowTransTime
             flowTransTimes.append(flowTransTime)
             print >> f, "%d\t%f\t%f\t%f" % (flow.flowId, flowTransTime, flow.startTime, flow.finishTime)

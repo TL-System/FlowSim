@@ -55,43 +55,7 @@ class FlowScheduler:
     def GetAllFlows(self):
         return self.flows
 
-    def UpdateFlowState(self, curTime, flow):
-        # Update remain size
-        flow.remainSize -= flow.bw * (curTime - flow.updateTime)
-        flow.updateTime = curTime
-
-        pathInLink = flow.pathLinkIds
-        bw = 1.0 * Gb
-        for linkId in pathInLink:
-            link = self.Links[linkId]
-            # if link.scheduling == 'maxmin':
-            #     curBw = link.linkCap / len(link.flowIds)
-            # elif link.scheduling == 'wfq':
-            #     # Active queues
-            #     # Shares of this flow's queue
-            #     # share = bw * weightOwnQ / sumActiveWeights
-            #     # Share of this flow in its queue
-            #     #curBw = share / len(flowsInSameQueue)
-            #     pass
-            # elif link.scheduling == 'sp':
-            #     highest = max(link.flowIds, key=lambda x: x.priority)
-            #     if flow.priority == highest.priority:
-            #         all_highest = [f for f in link.flowIds if f.priority == highest.priority]
-            #         curBw = link.linkCap / len(all_highest)
-            #     else:
-            #         curBw = 0.0001 # to avoid division by zero errors
-            curBw = link.UpdateRates(flow)
-            if bw > curBw:
-                bw = curBw
-        # TODO: work conserving
-        # wastingFlows = self.runningFlows
-        # while len(wastingFlows) > 0:
-        #    for wf in wastingFlows:
-        #        wfbw = wf.bw
-        flow.bw = bw
-        flow.finishTime = curTime + flow.remainSize / bw
-
-    def UpdateFlow(self, curFlow, flag):
+    def UpdateFlow1(self, curFlow, flag):
         """
         Find related flows and update their flowBw, transTime, endTime.
         """
@@ -101,51 +65,110 @@ class FlowScheduler:
             link = self.Links[linkId]
             if flag == "remove":
                 link.flowIds.remove(curFlow.flowId)
-                del link.flowRates[curFlow.flowId]
                 curTime = curFlow.finishTime
             elif flag == "insert":
                 link.flowIds.append(curFlow.flowId)
-                link.flowRates[curFlow.flowId] = 0.00001
                 curTime = curFlow.startTime
                 curFlow.updateTime = curTime
+        current_flows = list(self.runningFlows)
+        residual_cap = {}
+        residual_flowIds = {}
+        for link_id in self.Links:
+            link = self.Links[link_id]
+            residual_cap[link_id] = link.linkCap
+            residual_flowIds[link_id] = list(link.flowIds)
+        while current_flows != []:
+            bottleneck_rate = 10.0e100
+            bottleneck_link = ()
+            for link_id in self.Links:
+                if len(residual_flowIds[link_id]) != 0:
+                    if bottleneck_rate >= residual_cap[link_id] / len(residual_flowIds[link_id]):
+                        bottleneck_rate = residual_cap[link_id] / len(residual_flowIds[link_id])
+                        bottleneck_link = link_id
+            for flowId in residual_flowIds[bottleneck_link]:
+                flow = self.flows[flowId]
+                flow.remainSize -= flow.bw * (curTime - flow.updateTime)
+                flow.updateTime = curTime
+                flow.bw = bottleneck_rate
+                flow.finishTime = curTime + flow.remainSize / bottleneck_rate
+                current_flows.remove(flow)
+                pathInLink = flow.pathLinkIds
+                for linkId in pathInLink:
+                    residual_cap[linkId] = residual_cap[linkId] - bottleneck_rate
+                    residual_flowIds[linkId].remove(flowId)
+        nodeInPath = curFlow.pathNodeIds
+        for nodeId in nodeInPath:
+            node = self.Nodes[nodeId]
+            if flag == "remove":
+                node.flowIds.remove(curFlow.flowId)
+            elif flag == "insert":
+                node.flowIds.append(curFlow.flowId)
 
-        #each flow get bandwidth on each link in a fair share way
+    def UpdateFlow2(self, curFlow, flag):
+        """
+        Find related flows and update their flowBw, transTime, endTime.
+        """
+        curTime = 0.0
+        pathInLink = curFlow.pathLinkIds
         for linkId in pathInLink:
             link = self.Links[linkId]
-            for flowId in link.flowIds:
-                flow = self.flows[flowId]
-                self.UpdateFlowState(curTime, flow)
-
-        # allocate spare bandwidth to the new flow
-        if flag == "insert":
-           min_bw = 1.0 * Gb
-           curFlowId = curFlow.flowId
-           for linkId in pathInLink:
-               link = self.Links[linkId]
-               sparebw = 0
-               for flowId in link.flowIds:
-                   if flowId != curFlowId:
-                      flow = self.flows[flowId]
-                      if flow.bw < link.flowRates[flowId]:
-                         sparebw += link.flowRates[flowId]- flow.bw
-                         link.flowRates[flowId] = flow.bw
-                         # print "spare bandwidth: ",sparebw
-               link.flowRates[curFlowId] += sparebw
-               # if sparebw != 0:
-                #  print "allocated sparebw",sparebw
-               if link.flowRates[curFlowId] < min_bw:
-                   min_bw = link.flowRates[curFlowId]
-           curFlow.bw = min_bw
-           curFlow.finishTime = curTime + curFlow.remainSize / min_bw
+            if flag == "remove":
+                link.flowIds.remove(curFlow.flowId)
+                curTime = curFlow.finishTime
+            elif flag == "insert":
+                link.flowIds.append(curFlow.flowId)
+                curTime = curFlow.startTime
+                curFlow.updateTime = curTime
+        current_flows = list(self.runningFlows)
+        current_links = list(self.Links)
+        residual_cap = {}
+        residual_flowIds = {}
+        for link_id in self.Links:
+            link = self.Links[link_id]
+            residual_cap[link_id] = link.linkCap
+            residual_flowIds[link_id] = list(link.flowIds)
+        for flow in current_flows:
+            flow.remainSize -= flow.bw * (curTime - flow.updateTime)
+            flow.bw = 0.0
+        while current_flows != []:
+            bottleneck_rate = 10.0e100
+            for link_id in current_links:
+                if len(residual_flowIds[link_id]) != 0:
+                    if bottleneck_rate >= residual_cap[link_id] / len(residual_flowIds[link_id]):
+                        bottleneck_rate = residual_cap[link_id] / len(residual_flowIds[link_id])
+            if bottleneck_rate == 10.0e100:
+                print "Error......"
+            links_to_remove = []
+            for link_id in current_links:
+                residual_cap[link_id] = residual_cap[link_id] - (bottleneck_rate*len(residual_flowIds[link_id]))
+                if residual_cap[link_id] <= 1.0e-20:
+                    links_to_remove.append(link_id)
+            for link_id in links_to_remove:
+                current_links.remove(link_id)
+            flows_to_remove = []
+            for flow in current_flows:
+                flow.bw += bottleneck_rate
+                pathInLink = flow.pathLinkIds
+                check = 1
+                for link_id in pathInLink:
+                    if residual_cap[link_id] <= 1.0e-20:
+                        check = 0
+                        break
+                if check == 0:
+                    pathInLink = flow.pathLinkIds
+                    for link_id in pathInLink:
+                        residual_flowIds[link_id].remove(flow.flowId)
+                    flow.updateTime = curTime
+                    flow.finishTime = curTime + flow.remainSize / flow.bw
+                    flows_to_remove.append(flow)
+            for flow in flows_to_remove:
+                current_flows.remove(flow)
 
         nodeInPath = curFlow.pathNodeIds
         for nodeId in nodeInPath:
             node = self.Nodes[nodeId]
             if flag == "remove":
                 node.flowIds.remove(curFlow.flowId)
-                # update q value of spines
-               # if len() == 5 and nodeInPath.index(linkId) == 2:
-               #     node.qvalue += curFlow.flowSize / (curFlow.finishTime - curFlow.startTime)
             elif flag == "insert":
                 node.flowIds.append(curFlow.flowId)
 

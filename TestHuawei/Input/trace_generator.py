@@ -4,7 +4,6 @@ sys.path.append("../..")
 import csv
 import math
 from random import choice
-from Topology.SpineLeaf import *
 import getopt
 
 #the size of flows to be generate (in KB)
@@ -15,26 +14,38 @@ longtailed_percent = {"1":0.4, "2":0.12, "3":0.11, "7":0.1, "267":0.1, "2107":0.
 
 # the percentage of flows of different sizes under uniform distribution
 uniform_percent = {"1":0.12, "2":0.13, "3":0.12, "7":0.13, "267":0.12, "2107":0.13, "6667":0.12, "666667":0.13}
-opts, args = getopt.getopt(sys.argv[1:], "n:t:", ["number=", "type="])
+opts, args = getopt.getopt(sys.argv[1:], "n:i:server:tor:t", ["number=", "input=", "server=", "tor=", "t="])
 
-flow_num =1000
+flow_num = 1000
 trace_flag = 0
 for o, a in opts:
     if o in ("-n", "--number"):
         # input total flow number 
         flow_num = int(a)
-    elif o in ("-t", "--type"):
+    elif o in ("-t", "--t"):
         # input trace type
         trace_type = a
         if trace_type == "longtailed":
             trace_flag = 0
         elif trace_type == "uniform":
             trace_flag = 1
+    if o in ("-server", "--server"):
+        # input total flow number
+        SERVER = int(a)
+    if o in ("-tor", "--tor"):
+        # input total flow number
+        TOR = int(a)
 
 #initialize flow infomation
 f_info = [0.0]*7
 #initialize current time
 current_time = 0.0
+
+if trace_flag == 0:
+    f = open("Input/longtailed_trace.csv", "w")
+elif trace_flag == 1:
+    f = open("Input/uniform_trace.csv", "w")
+
 
 # enumerate flow sizes
 for fsize in f_sizes:
@@ -66,5 +77,5 @@ for fsize in f_sizes:
         f_info[6] = str(f_info[6])
         # print flow infomation
         line_toprint = ','.join(map(str, f_info))
-        print line_toprint.rstrip('\r\n')
-
+        print >> f, line_toprint.rstrip('\r\n')
+f.close()
