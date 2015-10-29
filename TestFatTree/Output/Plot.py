@@ -1,4 +1,4 @@
-__author__ = 'lich'
+
 
 import Gnuplot, Gnuplot.funcutils
 import getopt, sys

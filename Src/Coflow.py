@@ -1,4 +1,4 @@
-__author__ = 'lich'
+
 
 from Flow import *
 

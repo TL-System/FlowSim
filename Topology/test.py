@@ -1,4 +1,4 @@
-__author__ = 'lich'
+
 
 from FatTree import *
 from SpineLeaf import *

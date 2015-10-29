@@ -1,4 +1,4 @@
-__author__ = 'lich'
+
 
 
 # This file describes the base class of Routing

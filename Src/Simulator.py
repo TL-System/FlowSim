@@ -1,4 +1,4 @@
-__author__ = 'lich'
+
 
 from Unit import *
 from TestHuawei.Input.make_trace import *

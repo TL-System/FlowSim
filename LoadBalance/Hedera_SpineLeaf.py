@@ -1,4 +1,4 @@
-__author__ = 'lich'
+
 
 
 class Hedera_SpineLeaf(object):

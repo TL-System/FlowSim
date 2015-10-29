@@ -1,4 +1,4 @@
-__author__ = 'lich'
+
 
 from Unit import *
 # This file describes the class FlowScheduler

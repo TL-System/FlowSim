@@ -10,6 +10,6 @@ ECMP	ECMP_FatTree.py	/^class ECMP(Routing):$/;"	c
 GetAggr	ECMP_FatTree.py	/^    def GetAggr(self, serverId, torId):$/;"	m	class:ECMP
 GetToR	ECMP_FatTree.py	/^    def GetToR(self, serverId):$/;"	m	class:ECMP
 IsSamePod	ECMP_FatTree.py	/^    def IsSamePod(self, srcId, dstId):$/;"	m	class:ECMP
-__author__	ECMP_FatTree.py	/^__author__ = 'lich'$/;"	v
+__author__	ECMP_FatTree.py	/^ $/;"	v
 __del__	ECMP_FatTree.py	/^    def __del__(self):$/;"	m	class:ECMP	file:
 a	ECMP_FatTree.py	/^a = 0$/;"	v
