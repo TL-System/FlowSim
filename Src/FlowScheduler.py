@@ -126,17 +126,16 @@ class FlowScheduler:
         for flow in current_flows:
             flow.remainSize -= flow.bw * (curTime - flow.updateTime)
             flow.bw = 0.0
-        while current_flows != []:
-            bottleneck_rate = 10.0e100
+        while current_flows:
+            bottleneck_rate = link.linkCap
             for link_id in current_links:
                 if len(residual_flowIds[link_id]) != 0:
                     if bottleneck_rate >= residual_cap[link_id] / len(residual_flowIds[link_id]):
                         bottleneck_rate = residual_cap[link_id] / len(residual_flowIds[link_id])
-            if bottleneck_rate == 10.0e100:
-                print "Error......"
+            bottleneck_rate = max([min([bottleneck_rate, link.linkCap]), 0.001])
             links_to_remove = []
             for link_id in current_links:
-                residual_cap[link_id] = residual_cap[link_id] - (bottleneck_rate * len(residual_flowIds[link_id]))
+                residual_cap[link_id] -= bottleneck_rate * len(residual_flowIds[link_id])
                 if residual_cap[link_id] <= 1.0e-20:
                     links_to_remove.append(link_id)
             for link_id in links_to_remove:
@@ -168,7 +167,7 @@ class FlowScheduler:
             elif flag == "insert":
                 node.flowIds.append(curFlow.flowId)
 
-    def PrintFlows(self):
+    def PrintFlows(self, outname=None):
         """
         print finishedFlows
         """

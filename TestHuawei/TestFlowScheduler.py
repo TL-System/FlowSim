@@ -12,38 +12,64 @@ outDir = "Output/"
 
 
 class TestFlowScheduler(FlowScheduler):
-    def AssignFlows(self, topo, filename="Input/trace.csv"):
+    def AssignFlows(self, topo, filename="Input/load20host32MR.txt"):
         # print sum(1 for li in open(filename,'r'))
         f = open(filename, "r")
+        # skip first line
+        # next(f)
         coflowsize = {}
         coflowwidth = {}
         line_count = 0
         for line in f.readlines():
-            l = line.rstrip('\r\n').split(',')
+            l = line.rstrip('\n').split(',')
+            # print l
+            # skip title line
+            if line_count == 0:
+                line_count += 1
+                continue
             line_count += 1
-            for i in range(1):
-                # print l
-                flow = Flow()
-                flow.startId = int(l[0])
-                flow.endId = int(l[2])
-                # flow.startId = choice(range(topo.numOfServers-20)) + int(l[0])
-                # flow.endId = choice(range(topo.numOfServers-20)) + int(l[2])
-                # if flow.startId/topo.serverPerRack == flow.endId/topo.serverPerRack:
-                #    flow.endId = (flow.endId + topo.serverPerRack)%topo.numOfServers
-                # flow.SetFlowSize(float(l[6])*1024*1024)
-                flow.SetFlowSize(float(l[6]))
-                flow.startTime = float(l[4])
-                flow.coflowId = int(l[5])
-                if flow.coflowId not in coflowsize:
-                    coflowsize[flow.coflowId] = flow.flowSize
-                    coflowwidth[flow.coflowId] = 1
-                else:
-                    coflowsize[flow.coflowId] += flow.flowSize
-                    coflowwidth[flow.coflowId] += 1
-                flow.flowId = len(self.flows)
-                self.flows.append(flow)
-                # if line_count == 100:
-                #    break
+            flow = Flow()
+            flow.startId = int(l[4])
+            flow.endId = int(l[5])
+            flow.SetFlowSize(float(l[1]))
+            flow.startTime = float(l[2])
+            flow.coflowId = int(l[3])
+            if flow.coflowId not in coflowsize:
+                coflowsize[flow.coflowId] = flow.flowSize
+                coflowwidth[flow.coflowId] = 1
+            else:
+                coflowsize[flow.coflowId] += flow.flowSize
+                coflowwidth[flow.coflowId] += 1
+            flow.flowId = len(self.flows)
+            self.flows.append(flow)
+            # if line_count >= 10:
+                # break
+        # for line in f.readlines():
+        # l = line.rstrip('\r\n').split(',')
+        # line_count += 1
+        # for i in range(1):
+        #     # print l
+        #     flow = Flow()
+        #     flow.startId = int(l[0])
+        #     flow.endId = int(l[2])
+        #     # flow.startId = choice(range(topo.numOfServers-20)) + int(l[0])
+        #     # flow.endId = choice(range(topo.numOfServers-20)) + int(l[2])
+        #     # if flow.startId/topo.serverPerRack == flow.endId/topo.serverPerRack:
+        #     #    flow.endId = (flow.endId + topo.serverPerRack)%topo.numOfServers
+        #     # flow.SetFlowSize(float(l[6])*1024*1024)
+        #     flow.SetFlowSize(float(l[6]))
+        #     flow.startTime = float(l[4])
+        #     flow.coflowId = int(l[5])
+        #     if flow.coflowId not in coflowsize:
+        #         coflowsize[flow.coflowId] = flow.flowSize
+        #         coflowwidth[flow.coflowId] = 1
+        #     else:
+        #         coflowsize[flow.coflowId] += flow.flowSize
+        #         coflowwidth[flow.coflowId] += 1
+        #     flow.flowId = len(self.flows)
+        #     self.flows.append(flow)
+        #     # if line_count == 100:
+        #     #    break
 
         FlowScheduler.AssignFlows(self)
         # print "number of input flows = ",len(self.flows)
@@ -56,12 +82,12 @@ class TestFlowScheduler(FlowScheduler):
             writer.writerow([k, coflowsize[k], coflowwidth[k]])
         f.close()
 
-    def PrintFlows(self):
-        f_name = outDir + "out.txt"
+    def PrintFlows(self, outname=None):
+        f_name = outDir + "out{}.txt".format(outname)
         f = open(f_name, "w")
-        f_name = outDir + "plot.dat"
+        f_name = outDir + "plot{}.dat".format(outname)
         f_plot = open(f_name, "w")
-        f_name = outDir + "coflow.txt"
+        f_name = outDir + "coflow{}.txt".format(outname)
         f_coflow = open(f_name, "w")
         coflow = {}
         average_flowTransTime = 0.0
@@ -111,3 +137,5 @@ class TestFlowScheduler(FlowScheduler):
 if __name__ == "__main__":
     tfs = TestFlowScheduler()
     tfs.AssignFlows()
+    del tfs
+

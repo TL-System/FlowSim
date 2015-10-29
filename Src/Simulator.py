@@ -2,6 +2,7 @@ from Unit import *
 from TestHuawei.Input.make_trace import *
 import time
 
+
 # from Src.Flow import *
 # import sys
 # sys.path.append("..")
@@ -133,7 +134,7 @@ class Simulator:
         Fire up the simulator. The function calculates the transferring time for each flow.
         """
         # start all the flows along with updating related flow transfer time
-        self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
+        # self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
         if self.Qlearning_enable == 1:
             self.logfname = "Reward_QLearning" + self.setting + ".csv"
             self.logfname2 = "FCT_QLearning" + self.setting + ".csv"
@@ -156,7 +157,7 @@ class Simulator:
         for episode in range(self.max_episodes):
             # print "episode number ", episode+1
             # generate_trace()
-            # self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
+            self.AssignScheduler(FlowScheduler=self.schedType, args=self.TraceFName)
             self.sched.toStartFlows = self.sched.flows[:]
             self.sched.toStartFlows.sort(key=lambda x: x.startTime)
             self.sched.runningFlows = []
@@ -191,6 +192,7 @@ class Simulator:
                         self.sched.finishedFlows.append(toFinishFlow)
                         # Update related flow's transfer time in removing a flow
                         self.sched.UpdateFlow2(toFinishFlow, "remove")
+                        print "flow finishes at {}".format(toFinishFlow.finishTime)
                         # Resort runningFlows by endTime
                         self.sched.runningFlows.sort(key=lambda x: x.finishTime)
 
@@ -203,7 +205,6 @@ class Simulator:
                                 self.pre_ActiveFlowRemainSize = self.ActiveFlowRemainSize[:]
                                 self.Update(toFinishFlow)
                                 # self.printQlearningLog()
-
                     else:
                         break
 
@@ -305,7 +306,7 @@ class Simulator:
                 # remove this flow from start list
                 self.sched.toStartFlows.remove(curStartFlow)
 
-            # print "Now, all the flows are started"
+            print "Now, all the flows are started"
             # Iteratively update flow's transfer time in running list until all the flows are finished
             while self.sched.runningFlows:
                 # the first flow is always with earliest finish Time
@@ -317,6 +318,7 @@ class Simulator:
                 # Update related flow's transfer time in removing a flow
                 self.sched.UpdateFlow2(curFinishFlow, "remove")
                 # Resort runningFlows by endTime
+                print "flow finishes at {}".format(curFinishFlow.finishTime)
                 self.sched.runningFlows.sort(key=lambda x: x.finishTime)
 
                 # update state and reward for Qlearning algorithm
@@ -331,7 +333,8 @@ class Simulator:
                         # self.printQlearningLog()
 
             # print "Finally, all the flows are finished"
-            self.sched.PrintFlows()
+            namesp = self.logfname.split('_')
+            self.sched.PrintFlows(outname=namesp[1])
             # self.printQlearningLog()
             # if self.Qlearning_enable == 1:
             #    self.logf.close()
@@ -364,7 +367,7 @@ class Simulator:
         logf = open("{0}{1}".format(self.logDir, self.logfname), "a")
         # TODO: Everything it needs is not available. Variable Scope is not set properly.
         print >> logf, "%d,%d,%d,%f,%f" % (
-        self.stateId, self.stateId + 1, self.action[2], self.reward[0], self.reward[1])
+            self.stateId, self.stateId + 1, self.action[2], self.reward[0], self.reward[1])
         logf.close()
         #  flag = 0
         statename_list = ["LinkUtilization", "ActiveFlowNum", "ActiveElephantFlowNum", "ActiveFlowRemainSize"]

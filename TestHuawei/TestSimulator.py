@@ -23,7 +23,7 @@ alpha = 1.0
 
 routing_dict = {'LB': LB, 'ECMP': ECMP, 'Qlearning': Qlearning, 'FlowLB': FlowLB}
 routing_scheme = LB
-trace_FName = "Input/trace.csv"
+# trace_FName = "" # "Input/trace.csv"
 server = 4
 core = 8
 tor = 8
@@ -74,7 +74,7 @@ for o, a in opts:
         max_episodes = int(a)
 
 if __name__ == "__main__":
-    for v in (LB, ECMP, FlowLB, Qlearning):
+    for v in (ECMP, FlowLB, Qlearning, LB):
         # routing_scheme = v
         print "routing scheme is {}".format(v)
         sim = Simulator()
@@ -84,9 +84,10 @@ if __name__ == "__main__":
         sim.AssignRoutingEngine(max_episodes, reward_type, features, number_hidden_nodes_per_layer, exploration_type,
                                 eps, setting, Routing=v  # Routing=routing_scheme
                                 )
-        sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args="Input/trace.csv")
-        sim.setTraceFName(TraceFName=trace_FName)
-        print trace_FName
+        tracename = "Input/load20host32MR.txt"
+        sim.setTraceFName(tracename)
+        sim.AssignScheduler(FlowScheduler=TestFlowScheduler, args=tracename)
+        # print trace_FName
         sim.setSchedType(FlowScheduler=TestFlowScheduler)
         start_time = time.time()
         sim.Run()
