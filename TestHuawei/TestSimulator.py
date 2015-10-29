@@ -22,7 +22,7 @@ avgFlowNum = 1
 alpha = 1.0
 
 routing_dict = {'LB': LB, 'ECMP': ECMP, 'Qlearning': Qlearning, 'FlowLB': FlowLB}
-routing_scheme = FlowLB
+routing_scheme = LB
 trace_FName = "Input/trace.csv"
 server = 10
 core = 10

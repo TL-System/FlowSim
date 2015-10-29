@@ -146,6 +146,12 @@ class Simulator:
             self.logf = open(self.logDir + self.logfname, "w")
             self.logfname2 = "FCT_FlowLB" + self.setting + ".csv"
             self.logf2 = open(self.logDir + self.logfname2, "w")
+        else:
+            # Most likely for LB
+            self.logfname = "Reward_LB" + self.setting + ".csv"
+            self.logf = open(self.logDir + self.logfname, "w")
+            self.logfname2 = "FCT_LB" + self.setting + ".csv"
+            self.logf2 = open(self.logDir + self.logfname2, "w")
         for episode in range(self.max_episodes):
             # print "episode number ", episode+1
             # generate_trace()
