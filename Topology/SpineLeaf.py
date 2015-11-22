@@ -9,13 +9,8 @@ from Src.Node import *
 from Src.Link import *
 from math import ceil, floor
 
-SERVER = 4
-TOR = 6
-CORE = 4
-
-
 class SpineLeaf(Topology):
-    def __init__(self, s=SERVER, t=TOR, c=CORE):
+    def __init__(self, s, t, c):
         # initialize nodes and links
         Topology.__init__(self)
         self.serverPerRack = s
@@ -72,13 +67,13 @@ class SpineLeaf(Topology):
     # Given id of server, return id of rack
     # server and rack are numbered starting from 0
     def GetRackId(self, serverId):
-        return serverId / SERVER
+        return serverId / self.serverPerRack
 
     def GetSameRack(self, serverId):
         # return the list of servers in the same rack with serverId
         rackId = self.GetRackId
-        rackFirst = rackId * SERVER
-        rackLast = rackFirst + SERVER
+        rackFirst = rackId * self.serverPerRack
+        rackLast = rackFirst + self.serverPerRack
         rackList = range(rackFirst, rackLast)
         return rackList
 
@@ -87,7 +82,7 @@ class SpineLeaf(Topology):
         This will return a serverId in another rack.
         """
         # return the server in the next rack with the same location, an offset of K/2
-        neighborId = (serverId + SERVER) % self.numOfServers
+        neighborId = (serverId + self.serverPerRack) % self.numOfServers
         return neighborId
 
     def ConvertToNodeId(self, id, role):

@@ -31,8 +31,8 @@ class NeuralNetwork(object):
         for layer in range(self.n_layers - 1):
             n = self.sizes[layer]
             m = self.sizes[layer + 1]
-            self.weights.append(np.random.normal(0, 1, (m, n)))
-            self.biases.append(np.random.normal(0, 1, (m, 1)))
+            self.weights.append(np.random.normal(0, 1, (m, n))/50.0)
+            self.biases.append(np.random.normal(0, 1, (m, 1))/50.0)
             self.inputs.append(np.zeros((n, 1)))
             self.outputs.append(np.zeros((n, 1)))
             self.errors.append(np.zeros((n, 1)))
